@@ -1,0 +1,42 @@
+- name: Get newer version
+  get_url:
+    url: https://github.com/containerd/containerd/releases/download/v1.6.12/containerd-1.6.12-linux-amd64.tar.gz
+    dest: /tmp/containerd.tar.gz    
+
+- name: Extract containerd
+  unarchive:
+    src: /tmp/containerd.tar.gz
+    dest: /tmp/
+    remote_src: true
+
+- name: Stop service
+  become: true
+  systemd:
+    state: stopped
+    name: containerd
+
+- name: Copy files
+  become: true
+  copy: 
+    src: /tmp/bin/
+    dest: /user/bin/
+    directory_mode: true
+    remote_src: true
+
+- name: Start service
+  become: true
+  systemd:
+    state: started
+    name: containerd
+
+- name: Remove default config
+  become: true
+  file:
+    path: /etc/containerd/config.toml
+    state: absent
+
+- name: Restore config
+  become: true
+  systemd:
+    name: containerd
+    state: restarted

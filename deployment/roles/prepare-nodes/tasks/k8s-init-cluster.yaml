@@ -1,0 +1,60 @@
+---
+- name: Swap off
+  become: true
+  shell: swapoff -a
+
+- name: Init cluster
+  become: true
+  when: inventory_hostname == "master1"
+  shell: "kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ hostvars[inventory_hostname].ansible_host }} --service-cidr=10.243.0.0/16"
+  register: kubeadm_output
+
+- name: create .kube directory
+  become: yes
+  when: inventory_hostname == "master1"
+  become_user: user
+  file:
+    path: $HOME/.kube
+    state: directory
+    mode: 0755
+
+- name: setup user account for k8s
+  become: true
+  when: inventory_hostname == "master1"
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/user/.kube/config
+    remote_src: yes
+    owner: user
+
+- name: Get Calico manifest
+  become: true
+  when: inventory_hostname == "master1"
+  get_url:
+    url: https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+    dest: /tmp/calico.yaml
+
+- name: setup network plugin
+  when: inventory_hostname == "master1"
+  shell: kubectl apply -f /tmp/calico.yaml
+
+- name: generate join token
+  when: inventory_hostname == "master1"
+  shell: kubeadm token create --print-join-command
+  register: join_command
+
+- name: save join command to ansible controller
+  when: inventory_hostname == "master1"
+  become: true
+  local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="/tmp/join.txt"
+
+- name: get join command file
+  when: inventory_hostname in groups['workers']
+  copy:
+    src: /tmp/join.txt
+    dest: /tmp/join.sh
+
+- name: join workers
+  when: inventory_hostname in groups['workers']
+  become: true
+  command: sh /tmp/join.sh
