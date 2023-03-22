@@ -1,0 +1,46 @@
+---
+- name: Add yum-config-manager
+  become: true
+  yum:
+    state: present
+    name: yum-utils
+
+- name: Add docker-ce repo to yum
+  become: true
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+- name: install docker-ce
+  become: true
+  yum:
+    state: present
+    name: docker-ce
+
+- name: Enable Docker
+  become: true
+  systemd:
+    enabled: true
+    name: docker
+
+- name: Start Docker
+  become: true
+  systemd:
+    state: started
+    name: docker
+
+- name: Create docker group
+  become: true
+  group:
+    state: present
+    name: docker
+
+- name: Get username
+  shell: whoami
+  register: username
+
+- name: Add current user to docker group
+  become: true
+  user:
+    name: "{{ username.stdout }}"
+    shell: /bin/bash
+    groups: docker
+    append: yes

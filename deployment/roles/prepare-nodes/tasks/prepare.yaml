@@ -1,0 +1,5 @@
+- name: Add records to hosts file
+  become: true
+  blockinfile:
+    path: /etc/hosts
+    block: "{{ lookup('file', '../files/hosts.txt') }}"
