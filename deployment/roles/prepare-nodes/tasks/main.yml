@@ -1,9 +1,18 @@
 ---
-- hosts: all
-  tasks:
-    - import_tasks: prepare.yaml
-    - import_tasks: networking.yaml
-    - import_tasks: docker-install.yaml
-    - import_tasks: containerd-update.yaml
-    - import_tasks: k8s-install.yaml
-    - import_tasks: k8s-init-cluster.yaml
+- name: import prepare
+  import_tasks: prepare.yaml
+
+- name: import networking
+  import_tasks: networking.yaml
+
+- name: import docker
+  import_tasks: docker-install.yaml
+
+- name: import containerd
+  import_tasks: containerd-update.yaml
+
+- name: import install
+  import_tasks: k8s-install.yaml
+
+- name: import init
+  import_tasks: k8s-init-cluster.yaml

@@ -1,0 +1,5 @@
+- name: Run all
+  hosts: all
+  roles:
+    - prepare-nodes
+    - { role: external_dependencies_deploy, when: inventory_hostname == "master1" }

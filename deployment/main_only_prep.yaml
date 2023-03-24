@@ -1,0 +1,4 @@
+- name: Run all
+  hosts: all
+  roles:
+    - prepare-nodes

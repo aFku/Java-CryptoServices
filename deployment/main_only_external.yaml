@@ -1,0 +1,6 @@
+- name: Run all
+  hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - { role: external_dependencies_deploy, when: inventory_hostname == "master1" }

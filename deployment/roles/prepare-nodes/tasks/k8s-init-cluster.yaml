@@ -1,8 +1,4 @@
 ---
-- name: Swap off
-  become: true
-  shell: swapoff -a
-
 - name: Init cluster
   become: true
   when: inventory_hostname == "master1"

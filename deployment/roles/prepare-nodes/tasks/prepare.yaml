@@ -3,3 +3,38 @@
   blockinfile:
     path: /etc/hosts
     block: "{{ lookup('file', '../files/hosts.txt') }}"
+
+- name: Disable swap for current session
+  command: swapoff -a
+  become: true
+
+- name: Disable swap permanently, persist reboots
+  become: true
+  replace:
+    path: /etc/fstab
+    regexp: '^(\s*)([^#\n]+\s+)(\w+\s+)swap(\s+.*)$'
+    replace: '#\1\2\3swap\4'
+    backup: yes
+
+- name: install python3
+  become: true
+  yum:
+    state: present
+    name: 
+      - python3
+      - python3-setuptools
+      - python-setuptools
+      - python3-pip
+
+- name: Set alias for python3
+  blockinfile:
+    path: ~/.bashrc
+    block: alias python='python3'
+
+- name: install libs for python3
+  become: true
+  pip:
+    executable: pip3
+    name:
+      - kubernetes
+      - pyyaml

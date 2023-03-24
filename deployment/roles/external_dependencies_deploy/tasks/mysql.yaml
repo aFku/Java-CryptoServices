@@ -1,0 +1,18 @@
+---
+- name: Add secrets for MYSQL Server
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', '../files/mysql-secret.yaml') | from_yaml }}"
+    namespace: default
+
+- name: Add service for MYSQL Server
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', '../files/mysql-service.yaml') | from_yaml }}"
+    namespace: default
+
+- name: Add MYSQL deployment
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('file', '../files/mysql-deployment.yaml') | from_yaml }}"
+    namespace: default
