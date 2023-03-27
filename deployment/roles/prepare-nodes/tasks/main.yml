@@ -16,3 +16,8 @@
 
 - name: import init
   import_tasks: k8s-init-cluster.yaml
+
+- name: import metallb
+  vars:
+    ansible_python_interpreter: /usr/bin/python3  
+  import_tasks: metallb.yaml

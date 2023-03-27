@@ -38,3 +38,9 @@
     name:
       - kubernetes
       - pyyaml
+
+- name: install git
+  become: true
+  yum:
+    state: present
+    name: git

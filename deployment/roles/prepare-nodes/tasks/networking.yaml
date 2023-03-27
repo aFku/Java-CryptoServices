@@ -9,6 +9,7 @@
     port: "{{ item }}/tcp"
     state: enabled
   loop:
+    - 443
     - 6443
     - 2379
     - 2380
@@ -24,6 +25,7 @@
     port: "{{ item }}/tcp"
     state: enabled
   loop:
+    - 443
     - 10250
     - 30000
 

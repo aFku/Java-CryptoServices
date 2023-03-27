@@ -1,0 +1,49 @@
+- hosts: all
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Enable strictARP for kube-proxy
+      when: inventory_hostname == "master1"
+      shell: "kubectl get cm -n kube-system kube-proxy -o yaml > kube-proxy.yaml && sed -i 's/strictARP:.*$/strictARP: true/g' kube-proxy.yaml && kubectl replace -f kube-proxy.yaml && rm kube-proxy.yaml"
+
+    - name: Install helm
+      become: true
+      when: inventory_hostname == "master1"
+      shell: |
+             curl -fsSL -o get_helm.sh "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+             chmod 700 get_helm.sh
+             ./get_helm.sh
+             rm get_helm.sh
+
+    - name: Add metallb repo
+      when: inventory_hostname == "master1"
+      kubernetes.core.helm_repository:
+        name: metallb
+        repo_url: "https://metallb.github.io/metallb"
+
+    - name: Get chart values
+      when: inventory_hostname == "master1"
+      git:
+        repo: "https://github.com/metallb/metallb.git"
+        dest: /tmp/metallb-repo
+        force: true
+
+    - name: Workaround webhooks
+      when: inventory_hostname == "master1"
+      shell: "sed -i 's/validationFailurePolicy: .*/validationFailurePolicy: Ignore/g' /tmp/metallb-repo/charts/metallb/values.yaml"
+
+    - name: Install metallb
+      when: inventory_hostname == "master1" 
+      kubernetes.core.helm:
+        name: metallb
+        chart_ref: metallb/metallb
+        release_namespace: default
+        values_files:
+          - /tmp/metallb-repo/charts/metallb/values.yaml
+
+    - name: Add configmap for metallb
+      when: inventory_hostname == "master1"
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', 'roles/prepare-nodes/files/metallb-configmap.yaml') | from_yaml }}"
+        namespace: metallb-system
