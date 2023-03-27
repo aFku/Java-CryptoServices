@@ -1,0 +1,43 @@
+- hosts: 127.0.0.1
+  connection: local
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python3.8
+  tasks:
+
+    - name: Install Helm
+      become: true
+      shell: |
+          curl -fsSL -o /tmp/get_helm.sh "https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3"
+          chmod 700 /tmp/get_helm.sh
+          sh /tmp/get_helm.sh
+          rm /tmp/get_helm.sh
+
+    - name: Add MetalLB helm repository
+      kubernetes.core.helm_repository:
+        name: metallb
+        repo_url: "https://metallb.github.io/metallb"
+    
+    - name: Get chart values for MetalLB installation
+      git:
+        repo: "https://github.com/metallb/metallb.git"
+        dest: /tmp/metallb-repo
+        force: true
+
+    - name: Disable webhook validation to workaround failure during pool apply (Known issue propably related to certificates)
+      shell: "sed -i 's/validationFailurePolicy: .*/validationFailurePolicy: Ignore/g' /tmp/metallb-repo/charts/metallb/values.yaml"
+
+    - name: Install metallb
+      kubernetes.core.helm:
+        name: metallb
+        chart_ref: metallb/metallb
+        release_namespace: default
+        values_files:
+          - /tmp/metallb-repo/charts/metallb/values.yaml
+        namespace: metallb-system
+
+    - name: Add configmap for metallb
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', './metallb-pool') | from_yaml }}"
+        namespace: metallb-system
+

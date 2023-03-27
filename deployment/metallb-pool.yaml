@@ -1,0 +1,8 @@
+piVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: api-gateway-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.50.240-192.168.50.250
