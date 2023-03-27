@@ -26,6 +26,12 @@
     - name: Disable webhook validation to workaround failure during pool apply (Known issue propably related to certificates)
       shell: "sed -i 's/validationFailurePolicy: .*/validationFailurePolicy: Ignore/g' /tmp/metallb-repo/charts/metallb/values.yaml"
 
+    - name: Create metallb-system namespace
+      k8s:
+        name: metallb-system
+        kind: namespace
+        state: present
+
     - name: Install metallb
       kubernetes.core.helm:
         name: metallb
@@ -38,6 +44,6 @@
     - name: Add configmap for metallb
       kubernetes.core.k8s:
         state: present
-        definition: "{{ lookup('file', './metallb-pool') | from_yaml }}"
+        definition: "{{ lookup('file', './metallb-pool.yaml') | from_yaml }}"
         namespace: metallb-system
 

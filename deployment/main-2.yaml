@@ -22,7 +22,7 @@
     - name: Setup alias for kubectl
       blockinfile:
         path: ~/.bashrc
-        block: "alias kubectl='minikube kubectl'"
+        block: "alias kubectl='minikube kubectl -p dev-cluster --'"
         create: true
 
     - name: Clear clusters
