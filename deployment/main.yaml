@@ -1,0 +1,89 @@
+- hosts: 127.0.0.1
+  connection: local
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python3.8
+  tasks:
+
+    - name: Add yum-config-manager
+      become: true
+      yum:
+        state: present
+        name: yum-utils
+
+    - name: Add docker-ce repo to yum
+      become: true
+      shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+    - name: install docker-ce
+      become: true
+      yum:
+        state: present
+        name: docker-ce
+
+    - name: Enable Docker
+      become: true
+      systemd:
+        enabled: true
+        name: docker
+
+    - name: Start Docker
+      become: true
+      systemd:
+        state: started
+        name: docker
+
+    - name: Create docker group
+      become: true
+      group:
+        state: present
+        name: docker
+
+    - name: Get username
+      shell: whoami
+      register: username
+
+    - name: Add current user to docker group
+      become: true
+      user:
+        name: "{{ username.stdout }}"
+        groups: docker
+        append: yes
+
+    - name: Reconnect to reload user group
+      shell: newgrp docker
+
+    - name: Get minikube
+      get_url:
+        url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+        dest: /tmp/minikube_install
+
+    - name: Install minikube
+      become: true
+      shell: install /tmp/minikube_install /usr/local/bin/minikube
+
+    - name: Start minikube
+      shell: minikube start
+
+    - name: Get kubectl for minikube
+      shell: minikube kubectl --get po -A
+
+    - name: Setup alias for kubectl
+      blockinfile:
+        path: ~/.bashrc
+        block: "alias kubectl='minikube kubectl'"
+        create: true
+
+    - name: Clear clusters
+      shell: minikube delete --all
+
+    - name: Setup multi-node cluster
+      shell: minikube start --nodes 3 -p dev-cluster
+
+    - name: Test cluster and k8s module
+      kubernetes.core.k8s_info:
+        kind: Node
+      register: nodes
+
+    - name: Print nodes
+      debug:
+        msg: "{{ nodes }}"
