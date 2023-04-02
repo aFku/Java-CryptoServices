@@ -1,8 +1,9 @@
-package org.rcbg.afku.CryptoGenerator.services;
+package org.rcbg.afku.CryptoGenerator.services.PasswordGenerator;
 
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
+import org.rcbg.afku.CryptoGenerator.services.IGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class PasswordGenerator {
+public class PasswordGenerator implements IPasswordGenerator, IGenerator {
 
-    private Logger logger = LoggerFactory.getLogger(PasswordGenerator.class);
+    private final Logger logger = LoggerFactory.getLogger(PasswordGenerator.class);
 
     private int length;
     //private int seed;
@@ -25,9 +26,11 @@ public class PasswordGenerator {
     List<CharacterRule> generatorRules;
 
     private PasswordGenerator(){
-        // Defaults
+        this.reset();
+    }
+
+    public void reset(){
         this.length = 16;
-        //this.seed =
         this.numbersAllowed = false;
         this.uppercaseAllowed = false;
         this.specialCharsAllowed = false;
@@ -79,6 +82,7 @@ public class PasswordGenerator {
     }
 
     public PasswordGenerator withLength(int length){
+        if(length < 0) {throw new IllegalArgumentException("Length cannot be 0 or less");}
         this.length = length;
         return this;
     }
