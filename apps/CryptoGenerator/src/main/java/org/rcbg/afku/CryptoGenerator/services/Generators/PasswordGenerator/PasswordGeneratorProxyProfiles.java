@@ -1,8 +1,8 @@
-package org.rcbg.afku.CryptoGenerator.services.PasswordGenerator;
+package org.rcbg.afku.CryptoGenerator.services.Generators.PasswordGenerator;
 
 import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfile;
 import org.rcbg.afku.CryptoGenerator.exceptions.checked.ProfileNotLoaded;
-import org.rcbg.afku.CryptoGenerator.services.AbstractProfileLoader;
+import org.rcbg.afku.CryptoGenerator.services.Generators.AbstractProfileLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,6 @@ public class PasswordGeneratorProxyProfiles extends AbstractProfileLoader<Passwo
 
     @Override
     public String generate() throws ProfileNotLoaded {
-        this.isProfileLoaded();
         this.passwordGeneratorService.withLength(profile.getLength());
         if(profile.isNumbersAllowed()){this.passwordGeneratorService.withNumbers();}
         if(profile.isUppercaseAllowed()){this.passwordGeneratorService.withUppercase();}

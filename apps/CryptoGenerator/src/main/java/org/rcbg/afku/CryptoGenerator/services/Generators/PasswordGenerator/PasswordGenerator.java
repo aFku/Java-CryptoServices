@@ -1,9 +1,9 @@
-package org.rcbg.afku.CryptoGenerator.services.PasswordGenerator;
+package org.rcbg.afku.CryptoGenerator.services.Generators.PasswordGenerator;
 
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
-import org.rcbg.afku.CryptoGenerator.services.IGenerator;
+import org.rcbg.afku.CryptoGenerator.services.Generators.IGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

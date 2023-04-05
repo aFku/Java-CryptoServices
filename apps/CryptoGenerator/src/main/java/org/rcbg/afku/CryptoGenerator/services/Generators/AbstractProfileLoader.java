@@ -1,4 +1,4 @@
-package org.rcbg.afku.CryptoGenerator.services;
+package org.rcbg.afku.CryptoGenerator.services.Generators;
 
 import org.rcbg.afku.CryptoGenerator.dtos.AbstractProfile;
 import org.rcbg.afku.CryptoGenerator.exceptions.checked.ProfileNotLoaded;

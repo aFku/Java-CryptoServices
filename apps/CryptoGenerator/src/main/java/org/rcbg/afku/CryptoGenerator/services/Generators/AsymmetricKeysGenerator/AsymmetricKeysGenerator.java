@@ -1,6 +1,6 @@
-package org.rcbg.afku.CryptoGenerator.services.AsymmetricKeysGenerator;
+package org.rcbg.afku.CryptoGenerator.services.Generators.AsymmetricKeysGenerator;
 
-import org.rcbg.afku.CryptoGenerator.services.IGenerator;
+import org.rcbg.afku.CryptoGenerator.services.Generators.IGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

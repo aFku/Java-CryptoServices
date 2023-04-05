@@ -1,9 +1,9 @@
-package org.rcbg.afku.CryptoGenerator.services.AsymmetricKeysGenerator;
+package org.rcbg.afku.CryptoGenerator.services.Generators.AsymmetricKeysGenerator;
 
 import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfile;
 import org.rcbg.afku.CryptoGenerator.exceptions.checked.ProfileNotLoaded;
 import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CorruptedProfile;
-import org.rcbg.afku.CryptoGenerator.services.AbstractProfileLoader;
+import org.rcbg.afku.CryptoGenerator.services.Generators.AbstractProfileLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
