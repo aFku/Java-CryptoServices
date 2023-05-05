@@ -14,7 +14,7 @@ public abstract class AbstractProfileLoader<T extends AbstractProfile> {
 
     protected void loadProfile(T profile){
         this.profile = profile;
-        this.logger.info("New profile loaded - " + profile.toString());
+        this.logger.debug("New profile loaded - " + profile.toString());
     }
 
     protected void isProfileLoaded() throws ProfileNotLoaded {

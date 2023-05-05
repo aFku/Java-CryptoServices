@@ -2,6 +2,8 @@ package org.rcbg.afku.CryptoGenerator.services;
 
 import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfile;
 import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfile;
+import org.rcbg.afku.CryptoGenerator.exceptions.checked.ProfileNotLoaded;
+import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CheckedExceptionWrapper;
 import org.rcbg.afku.CryptoGenerator.services.Generators.AsymmetricKeysGenerator.AsymmetricKeysGeneratorProxyProfiles;
 import org.rcbg.afku.CryptoGenerator.services.Generators.PasswordGenerator.PasswordGeneratorProxyProfiles;
 import org.slf4j.Logger;
@@ -23,11 +25,25 @@ public class GenerationService {
     }
 
     public String generatePassword(PasswordProfile profile){
-        return "";
+        try {
+            String password = this.passwordGenerator.withProfile(profile).generate();
+            logger.info("Password has been generated with profile: " + profile.getName());
+            return password;
+        } catch (ProfileNotLoaded e) {
+            logger.error("Cannot generate password");
+            throw new CheckedExceptionWrapper(e.getMessage(), e.getClass().getSimpleName());
+        }
     }
 
     public String[] generateKeys(AsymmetricKeysProfile profile){
-        return new String[]{};
+        try {
+            String[] keys = this.asymmetricKeysGenerator.withProfile(profile).generate();
+            logger.info("Pair of keys has been generated with profile: " + profile.getName());
+            return keys;
+        } catch (ProfileNotLoaded e) {
+            logger.error("Cannot generate keys");
+            throw new CheckedExceptionWrapper(e.getMessage(), e.getClass().getSimpleName());
+        }
     }
 
 
