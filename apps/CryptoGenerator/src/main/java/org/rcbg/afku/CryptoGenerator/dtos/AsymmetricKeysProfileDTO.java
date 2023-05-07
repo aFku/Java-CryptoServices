@@ -14,4 +14,6 @@ public class AsymmetricKeysProfileDTO {
     private ProfileMetadata metadata;
 
     private AsymmetricKeysProfileProperties profileProperties;
+
+    // TO DO: toString()
 }
