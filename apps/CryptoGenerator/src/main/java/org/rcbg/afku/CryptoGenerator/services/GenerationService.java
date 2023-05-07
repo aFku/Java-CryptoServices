@@ -1,11 +1,11 @@
 package org.rcbg.afku.CryptoGenerator.services;
 
-import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfile;
-import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfile;
+import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfileDTO;
+import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfileDTO;
 import org.rcbg.afku.CryptoGenerator.exceptions.checked.ProfileNotLoaded;
 import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CheckedExceptionWrapper;
-import org.rcbg.afku.CryptoGenerator.services.Generators.AsymmetricKeysGenerator.AsymmetricKeysGeneratorProxyProfiles;
-import org.rcbg.afku.CryptoGenerator.services.Generators.PasswordGenerator.PasswordGeneratorProxyProfiles;
+import org.rcbg.afku.CryptoGenerator.services.Generators.AsymmetricKeysGenerator.AsymmetricKeysGeneratorProxyProfilesProp;
+import org.rcbg.afku.CryptoGenerator.services.Generators.PasswordGenerator.PasswordGeneratorProxyProfilesProp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,19 +15,19 @@ import org.springframework.stereotype.Service;
 public class GenerationService {
 
     private final Logger logger = LoggerFactory.getLogger(GenerationService.class);
-    private final PasswordGeneratorProxyProfiles passwordGenerator;
-    private final AsymmetricKeysGeneratorProxyProfiles asymmetricKeysGenerator;
+    private final PasswordGeneratorProxyProfilesProp passwordGenerator;
+    private final AsymmetricKeysGeneratorProxyProfilesProp asymmetricKeysGenerator;
 
     @Autowired
-    public GenerationService(PasswordGeneratorProxyProfiles passwordGenerator, AsymmetricKeysGeneratorProxyProfiles asymmetricKeysGenerator){
+    public GenerationService(PasswordGeneratorProxyProfilesProp passwordGenerator, AsymmetricKeysGeneratorProxyProfilesProp asymmetricKeysGenerator){
         this.passwordGenerator = passwordGenerator;
         this.asymmetricKeysGenerator = asymmetricKeysGenerator;
     }
 
-    public String generatePassword(PasswordProfile profile){
+    public String generatePassword(PasswordProfileDTO profile){
         try {
-            String password = this.passwordGenerator.withProfile(profile).generate();
-            logger.info("Password has been generated with profile: " + profile.getName());
+            String password = this.passwordGenerator.withProfileProperties(profile.getProfileProperties()).generate();
+            logger.info("Password has been generated with profile: " + profile.getMetadata().getProfileName());
             return password;
         } catch (ProfileNotLoaded e) {
             logger.error("Cannot generate password");
@@ -35,10 +35,10 @@ public class GenerationService {
         }
     }
 
-    public String[] generateKeys(AsymmetricKeysProfile profile){
+    public String[] generateKeys(AsymmetricKeysProfileDTO profile){
         try {
-            String[] keys = this.asymmetricKeysGenerator.withProfile(profile).generate();
-            logger.info("Pair of keys has been generated with profile: " + profile.getName());
+            String[] keys = this.asymmetricKeysGenerator.withProfileProperties(profile.getProfileProperties()).generate();
+            logger.info("Pair of keys has been generated with profile: " + profile.getMetadata().getProfileName());
             return keys;
         } catch (ProfileNotLoaded e) {
             logger.error("Cannot generate keys");

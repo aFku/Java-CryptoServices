@@ -1,6 +1,6 @@
 package org.rcbg.afku.CryptoGenerator.services.Generators.AsymmetricKeysGenerator;
 
-import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfile;
+import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfileProperties;
 import org.rcbg.afku.CryptoGenerator.exceptions.checked.ProfileNotLoaded;
 import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CorruptedProfile;
 import org.rcbg.afku.CryptoGenerator.services.Generators.AbstractProfileLoader;
@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 import java.security.NoSuchAlgorithmException;
 
 @Service
-public class AsymmetricKeysGeneratorProxyProfiles extends AbstractProfileLoader<AsymmetricKeysProfile> implements IAsymmetricKeysGenerator{
+public class AsymmetricKeysGeneratorProxyProfilesProp extends AbstractProfileLoader<AsymmetricKeysProfileProperties> implements IAsymmetricKeysGenerator{
 
-    private final Logger logger = LoggerFactory.getLogger(AsymmetricKeysGeneratorProxyProfiles.class);
+    private final Logger logger = LoggerFactory.getLogger(AsymmetricKeysGeneratorProxyProfilesProp.class);
     private final AsymmetricKeysGenerator keysGenerator;
 
     @Autowired
-    public AsymmetricKeysGeneratorProxyProfiles(AsymmetricKeysGenerator service){ this.keysGenerator = service; }
+    public AsymmetricKeysGeneratorProxyProfilesProp(AsymmetricKeysGenerator service){ this.keysGenerator = service; }
 
-    public AsymmetricKeysGeneratorProxyProfiles withProfile(AsymmetricKeysProfile profile){
+    public AsymmetricKeysGeneratorProxyProfilesProp withProfileProperties(AsymmetricKeysProfileProperties profile){
         this.keysGenerator.reset();
         this.logger.warn("Asymmetric keys generator has been reset");
         this.loadProfile(profile);

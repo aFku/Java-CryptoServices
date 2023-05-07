@@ -1,20 +1,20 @@
 package org.rcbg.afku.CryptoGenerator.services.Profiles;
 
-import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfile;
+import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfileProperties;
 
 public class PasswordProfileBuilder {
 
-    private PasswordProfile profile;
+    private PasswordProfileProperties profile;
 
     public void reset(){
-        this.profile = new PasswordProfile();
+        this.profile = new PasswordProfileProperties();
     }
 
     public PasswordProfileBuilder(){
         this.reset();
     }
 
-    public PasswordProfileBuilder withName(String name){
-
-    }
+//    public PasswordProfileBuilder withName(String name){
+//
+//    }
 }

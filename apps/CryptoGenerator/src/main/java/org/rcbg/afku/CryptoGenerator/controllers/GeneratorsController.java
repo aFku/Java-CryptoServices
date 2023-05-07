@@ -1,10 +1,7 @@
 package org.rcbg.afku.CryptoGenerator.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfile;
-import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfile;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/generators")
