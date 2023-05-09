@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 @Service
 public class ProfilesManager {
 
-    @Value("kubernetes.cluster.namespace")
+    @Value("${crd.namespace}")
     private String namespace;
 
     private final static Logger logger = LoggerFactory.getLogger(ProfilesManager.class);
