@@ -13,8 +13,11 @@ import org.rcbg.afku.CryptoGenerator.services.ProfilesManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.print.attribute.standard.Media;
 
 @RestController
 @RequestMapping("/api/v1/profiles")
@@ -27,17 +30,17 @@ public class ProfilesController {
         this.profilesManager = profilesManager;
     }
 
-    @GetMapping(value = "passwords")
+    @GetMapping(value = "passwords", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getPasswordProfile(HttpServletRequest request, @RequestParam String name){
         PasswordProfileDTO dto = profilesManager.getPasswordProfileByName(name);
-        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), ContentType.APPLICATION_JSON.toString());
+        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
-    @PostMapping(value = "passwords")
+    @PostMapping(value = "passwords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createPasswordProfile(HttpServletRequest request, @RequestBody PasswordProfileRequestBody requestBody){
         PasswordProfileDTO dto = profilesManager.createProfile(requestBody, "exampleUser"); // TO DO: Add user identification
-        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), ContentType.APPLICATION_JSON.toString());
+        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
@@ -47,17 +50,17 @@ public class ProfilesController {
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping(value = "asymmetrics")
+    @GetMapping(value = "asymmetrics", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getAsymmetricKeysProfile(HttpServletRequest request, @RequestParam String name){
         AsymmetricKeysProfileDTO dto = profilesManager.getAsymmetricKeysProfileByName(name);
-        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), ContentType.APPLICATION_JSON.toString());
+        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
-    @PostMapping(value = "asymmetrics")
+    @PostMapping(value = "asymmetrics", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAsymmetricKeysProfile(HttpServletRequest request, @RequestBody AsymmetricKeysProfileRequestBody requestBody){
         AsymmetricKeysProfileDTO dto = profilesManager.createProfile(requestBody, "exampleUser"); // TO DO: Add user identification
-        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), ContentType.APPLICATION_JSON.toString());
+        ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
