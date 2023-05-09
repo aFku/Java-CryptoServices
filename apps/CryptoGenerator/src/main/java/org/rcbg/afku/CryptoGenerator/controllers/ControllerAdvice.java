@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ConstraintViolation;
 import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CheckedExceptionWrapper;
+import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CorruptedProfile;
 import org.rcbg.afku.CryptoGenerator.responses.ResponseMetadata;
 import org.rcbg.afku.CryptoGenerator.responses.error.ErrorResponseBuilder;
 import org.slf4j.Logger;
@@ -59,5 +60,15 @@ public class ControllerAdvice{
         return builder.generate();
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({CorruptedProfile.class})
+    private ResponseEntity<?> handleWrongAlgorithmName(CorruptedProfile ex, HttpServletRequest request){
+        logger.error("Error type: CorruptedProfile, message: " + ex.getMessage());
+        return new ErrorResponseBuilder()
+                .withHttpStatus(HttpStatus.BAD_REQUEST)
+                .addMessage(ex.getMessage())
+                .withMetadata(new ResponseMetadata(request.getRequestURI(), HttpStatus.BAD_REQUEST.value(), MediaType.APPLICATION_JSON_VALUE))
+                .generate();
+    }
 
 }
