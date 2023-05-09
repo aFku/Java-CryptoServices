@@ -9,4 +9,4 @@ import io.fabric8.kubernetes.model.annotation.Version;
 @Version("v1")
 @Group("org.rcbg")
 @Kind("PasswordProfile")
-public class PasswordProfileCRD extends CustomResource<PasswordProfileSpec, Void> implements Namespaced { }
+public class PasswordProfileCR extends CustomResource<PasswordProfileSpec, Void> implements Namespaced { }

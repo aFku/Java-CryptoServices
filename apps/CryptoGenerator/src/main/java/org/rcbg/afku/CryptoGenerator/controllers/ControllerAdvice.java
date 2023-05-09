@@ -1,5 +1,6 @@
 package org.rcbg.afku.CryptoGenerator.controllers;
 
+import io.fabric8.kubernetes.client.KubernetesClientException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CheckedExceptionWrapper;
 import org.slf4j.Logger;
@@ -21,6 +22,12 @@ public class ControllerAdvice{
     private ResponseEntity<?> handleCheckedExceptionWrapper(CheckedExceptionWrapper ex, HttpServletRequest request){
         logger.error("Error type: " + ex.getCheckedName() + ", message: " + ex.getMessage());
         return new ResponseEntity<>("Internal error", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler({KubernetesClientException.class})
+    private ResponseEntity<?> handleAllK8sClientErrors(KubernetesClientException ex){
+        String x = ex.getStatus().getMessage();
+        return null;
     }
 
 
