@@ -11,15 +11,13 @@ import org.rcbg.afku.CryptoGenerator.k8sClient.models.PasswordProfile.PasswordPr
 public class K8sCrdClientFactory {
 
     public static MixedOperation<PasswordProfileCR, KubernetesResourceList<PasswordProfileCR>, Resource<PasswordProfileCR>> getPasswordProfileClient(){
-        try(KubernetesClient client = new KubernetesClientBuilder().build()) {
-            return client.resources(PasswordProfileCR.class);
-        }
+        KubernetesClient client = new KubernetesClientBuilder().build();
+        return client.resources(PasswordProfileCR.class);
     }
 
     public static MixedOperation<AsymmetricKeysProfileCR, KubernetesResourceList<AsymmetricKeysProfileCR>, Resource<AsymmetricKeysProfileCR>> getAsymmetricKeysProfileClient(){
-        try(KubernetesClient client = new KubernetesClientBuilder().build()) {
-            return client.resources(AsymmetricKeysProfileCR.class);
-        }
+        KubernetesClient client = new KubernetesClientBuilder().build();
+        return client.resources(AsymmetricKeysProfileCR.class);
     }
 
 }

@@ -38,7 +38,7 @@ public class ControllerAdvice{
     @ExceptionHandler({KubernetesClientException.class})
     private ResponseEntity<?> handleAllK8sClientErrors(HttpServletRequest request, KubernetesClientException ex){
         logger.error("Error type: KubernetesClientException, message: " + ex.getMessage());
-        HttpStatus httpStatus = HttpStatus.valueOf(ex.getCode());
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         return new ErrorResponseBuilder()
                 .withHttpStatus(httpStatus)
                 .addMessage(ex.getMessage())
