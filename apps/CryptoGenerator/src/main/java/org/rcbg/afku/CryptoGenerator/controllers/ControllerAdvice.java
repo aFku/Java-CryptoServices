@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ConstraintViolation;
 import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CheckedExceptionWrapper;
 import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.CorruptedProfile;
+import org.rcbg.afku.CryptoGenerator.exceptions.unchecked.ProfileNotFound;
 import org.rcbg.afku.CryptoGenerator.responses.ResponseMetadata;
 import org.rcbg.afku.CryptoGenerator.responses.error.ErrorResponseBuilder;
 import org.slf4j.Logger;
@@ -38,10 +39,15 @@ public class ControllerAdvice{
     @ExceptionHandler({KubernetesClientException.class})
     private ResponseEntity<?> handleAllK8sClientErrors(HttpServletRequest request, KubernetesClientException ex){
         logger.error("Error type: KubernetesClientException, message: " + ex.getMessage());
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        String message = ex.getMessage();
+        if(ex.getCode() == 409){
+            httpStatus = HttpStatus.CONFLICT;
+            message = "Profile with this name already exists.";
+        }
         return new ErrorResponseBuilder()
                 .withHttpStatus(httpStatus)
-                .addMessage(ex.getMessage())
+                .addMessage(message)
                 .withMetadata(new ResponseMetadata(request.getRequestURI(), httpStatus.value(), MediaType.APPLICATION_JSON_VALUE))
                 .generate();
     }
@@ -68,6 +74,17 @@ public class ControllerAdvice{
                 .withHttpStatus(HttpStatus.BAD_REQUEST)
                 .addMessage(ex.getMessage())
                 .withMetadata(new ResponseMetadata(request.getRequestURI(), HttpStatus.BAD_REQUEST.value(), MediaType.APPLICATION_JSON_VALUE))
+                .generate();
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler({ProfileNotFound.class})
+    private ResponseEntity<?> handleProfileNotFound(ProfileNotFound ex, HttpServletRequest request){
+        logger.error("Error type: ProfileNotFound, message: " + ex.getMessage());
+        return new ErrorResponseBuilder()
+                .withHttpStatus(HttpStatus.NOT_FOUND)
+                .addMessage(ex.getMessage())
+                .withMetadata(new ResponseMetadata(request.getRequestURI(), HttpStatus.NOT_FOUND.value(), MediaType.APPLICATION_JSON_VALUE))
                 .generate();
     }
 

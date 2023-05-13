@@ -27,7 +27,7 @@ public class GenerationService {
     public String generatePassword(PasswordProfileDTO profile){
         try {
             String password = this.passwordGenerator.withProfileProperties(profile.getProfileProperties()).generate();
-            logger.info("Password has been generated with profile: " + profile.getMetadata().getProfileName());
+            logger.info("Password has been generated with profile: " + profile.getProfileMetadata().getProfileName());
             return password;
         } catch (ProfileNotLoaded e) {
             logger.error("Cannot generate password");
@@ -38,7 +38,7 @@ public class GenerationService {
     public String[] generateKeys(AsymmetricKeysProfileDTO profile){
         try {
             String[] keys = this.asymmetricKeysGenerator.withProfileProperties(profile.getProfileProperties()).generate();
-            logger.info("Pair of keys has been generated with profile: " + profile.getMetadata().getProfileName());
+            logger.info("Pair of keys has been generated with profile: " + profile.getProfileMetadata().getProfileName());
             return keys;
         } catch (ProfileNotLoaded e) {
             logger.error("Cannot generate keys");

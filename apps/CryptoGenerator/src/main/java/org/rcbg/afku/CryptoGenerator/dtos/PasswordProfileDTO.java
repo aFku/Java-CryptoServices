@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PasswordProfileDTO {
-    private ProfileMetadata metadata;
+    private ProfileMetadata profileMetadata;
 
     private PasswordProfileProperties profileProperties;
 

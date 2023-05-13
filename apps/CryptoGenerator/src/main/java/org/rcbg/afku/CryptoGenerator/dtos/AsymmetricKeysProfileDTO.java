@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AsymmetricKeysProfileDTO {
 
-    private ProfileMetadata metadata;
+    private ProfileMetadata profileMetadata;
 
     private AsymmetricKeysProfileProperties profileProperties;
 
