@@ -1,8 +1,5 @@
 package org.rcbg.afku.CryptoGenerator.exceptions.unchecked;
 
-import lombok.Getter;
-import lombok.Setter;
-
 public class CheckedExceptionWrapper extends RuntimeException{
 
     private final String checkedName;

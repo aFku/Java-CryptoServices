@@ -1,12 +1,11 @@
 package org.rcbg.afku.CryptoGenerator.services.Generators;
 
-import org.rcbg.afku.CryptoGenerator.dtos.AbstractProfile;
 import org.rcbg.afku.CryptoGenerator.exceptions.checked.ProfileNotLoaded;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public abstract class AbstractProfileLoader<T extends AbstractProfile> {
+public abstract class AbstractProfileLoader<T> {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -27,6 +26,5 @@ public abstract class AbstractProfileLoader<T extends AbstractProfile> {
 
     public T getProfile(){
         return this.profile;
-
     }
 }
