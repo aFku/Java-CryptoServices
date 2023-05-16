@@ -5,23 +5,24 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Range;
 
 @Getter
 @Setter
 @NoArgsConstructor
 public class PasswordProfileProperties {
 
-    @Size(min = 6, max = 255, message = "Password length should be between 6 and 255")
-    private int length;
+    @Range(min = 6, max = 255, message = "Password length should be between 6 and 255")
+    private Integer length;
 
     @NotNull(message = "numbersAllowed cannot be null")
-    private  boolean numbersAllowed;
+    private  Boolean numbersAllowed;
 
     @NotNull(message = "uppercaseAllowed cannot be null")
-    private boolean uppercaseAllowed;
+    private Boolean uppercaseAllowed;
 
     @NotNull(message = "specialCharsAllowed cannot be null")
-    private boolean specialCharsAllowed;
+    private Boolean specialCharsAllowed;
 
     private String excludedSpecialChars;
 }

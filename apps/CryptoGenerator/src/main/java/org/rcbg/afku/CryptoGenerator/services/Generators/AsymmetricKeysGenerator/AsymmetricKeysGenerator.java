@@ -16,7 +16,7 @@ public class AsymmetricKeysGenerator implements IAsymmetricKeysGenerator, IGener
     Logger logger = LoggerFactory.getLogger(AsymmetricKeysGenerator.class);
 
     private KeyPairGenerator generator;
-    private int size;
+
     private boolean returnBase64;
 
     public AsymmetricKeysGenerator(){
@@ -29,18 +29,11 @@ public class AsymmetricKeysGenerator implements IAsymmetricKeysGenerator, IGener
         } catch (NoSuchAlgorithmException ex){
             logger.error(ex.toString());
         }
-        this.size = 2048;
         this.returnBase64 = false;
     }
 
     public AsymmetricKeysGenerator withAlgorithm(String algorithm) throws NoSuchAlgorithmException{
         this.generator = KeyPairGenerator.getInstance(algorithm);
-        return this;
-    }
-
-    public AsymmetricKeysGenerator withSize(int size){
-        if(size < 0) {throw new IllegalArgumentException("Size cannot be 0 or less");}
-        this.size = size;
         return this;
     }
 
@@ -58,10 +51,11 @@ public class AsymmetricKeysGenerator implements IAsymmetricKeysGenerator, IGener
 
     @Override
     public String[] generate(){
-        this.generator.initialize(this.size);
+        int size = AlgorithmSize.valueOf(this.generator.getAlgorithm()).getKeySize();
+        this.generator.initialize(size);
         KeyPair pair = this.generator.generateKeyPair();
         logger.info(String.format("Starting generating asymmetric keys with parameters - Algorithm: %s, Size: %d",
-                this.generator.getAlgorithm(), this.size));
+                this.generator.getAlgorithm(), size));
 
         String[] keys;
         if(returnBase64) {
@@ -75,10 +69,6 @@ public class AsymmetricKeysGenerator implements IAsymmetricKeysGenerator, IGener
 
     public String getAlgorithm(){
         return this.generator.getAlgorithm();
-    }
-
-    public int getSize(){
-        return this.size;
     }
 
     public boolean isResultBase64(){

@@ -31,8 +31,8 @@ public class ProfilesController {
     }
 
     @GetMapping(value = "passwords", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getPasswordProfile(HttpServletRequest request, @RequestParam String name){
-        PasswordProfileDTO dto = profilesManager.getPasswordProfileByName(name);
+    public ResponseEntity<?> getPasswordProfile(HttpServletRequest request, @RequestParam String profileName){
+        PasswordProfileDTO dto = profilesManager.getPasswordProfileByName(profileName);
         ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
@@ -45,14 +45,14 @@ public class ProfilesController {
     }
 
     @DeleteMapping(value = "passwords")
-    public ResponseEntity<?> deletePasswordProfile(@RequestParam String name){
-        profilesManager.deletePasswordProfileByName(name);
+    public ResponseEntity<?> deletePasswordProfile(@RequestParam String profileName){
+        profilesManager.deletePasswordProfileByName(profileName);
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.NO_CONTENT);
     }
 
     @GetMapping(value = "asymmetrics", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getAsymmetricKeysProfile(HttpServletRequest request, @RequestParam String name){
-        AsymmetricKeysProfileDTO dto = profilesManager.getAsymmetricKeysProfileByName(name);
+    public ResponseEntity<?> getAsymmetricKeysProfile(HttpServletRequest request, @RequestParam String profileName){
+        AsymmetricKeysProfileDTO dto = profilesManager.getAsymmetricKeysProfileByName(profileName);
         ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
@@ -65,8 +65,8 @@ public class ProfilesController {
     }
 
     @DeleteMapping(value = "asymmetrics")
-    public ResponseEntity<?> deleteAsymmetricKeysProfile(@RequestParam String name){
-        profilesManager.deleteAsymmetricKeysProfileByName(name);
+    public ResponseEntity<?> deleteAsymmetricKeysProfile(@RequestParam String profileName){
+        profilesManager.deleteAsymmetricKeysProfileByName(profileName);
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.NO_CONTENT);
     }
 }

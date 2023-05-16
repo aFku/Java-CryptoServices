@@ -31,11 +31,11 @@ public class AsymmetricKeysGeneratorProxyProfilesProp extends AbstractProfileLoa
     public String[] generate() throws ProfileNotLoaded {
         this.isProfileLoaded();
         try {
-            this.keysGenerator.withSize(this.profile.getSize()).withAlgorithm(this.profile.getAlgorithm());
+            this.keysGenerator.withAlgorithm(this.profile.getAlgorithm());
         } catch (NoSuchAlgorithmException ex){
             throw new CorruptedProfile("Loaded profile has wrong algorithm name. No such algorithm: " + this.profile.getAlgorithm());
         }
-        if(this.profile.isReturnBase64()){this.keysGenerator.returnBase64();}
+        if(this.profile.getReturnBase64()){this.keysGenerator.returnBase64();}
         return keysGenerator.generate();
     }
 }

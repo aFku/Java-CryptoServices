@@ -15,7 +15,6 @@ public interface AsymmetricKeysProfileMapper {
     @Mapping(target = "profileMetadata.profileName", source = "requestBody.profileName")
     @Mapping(target = "profileMetadata.creatorUserId", source = "creatorUserId")
     @Mapping(target = "profileMetadata.creationTimestamp", ignore = true)
-    @Mapping(target = "profileProperties.size", source = "requestBody.size")
     @Mapping(target = "profileProperties.algorithm", source = "requestBody.algorithm")
     @Mapping(target = "profileProperties.returnBase64", source = "requestBody.returnBase64")
     public AsymmetricKeysProfileDTO toFullDto(AsymmetricKeysProfileRequestBody requestBody, String creatorUserId);

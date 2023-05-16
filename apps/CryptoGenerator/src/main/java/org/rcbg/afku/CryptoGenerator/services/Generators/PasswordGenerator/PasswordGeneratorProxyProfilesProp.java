@@ -29,9 +29,9 @@ public class PasswordGeneratorProxyProfilesProp extends AbstractProfileLoader<Pa
     @Override
     public String generate() throws ProfileNotLoaded {
         this.passwordGeneratorService.withLength(profile.getLength());
-        if(profile.isNumbersAllowed()){this.passwordGeneratorService.withNumbers();}
-        if(profile.isUppercaseAllowed()){this.passwordGeneratorService.withUppercase();}
-        if(profile.isSpecialCharsAllowed()){this.passwordGeneratorService.withSpecialChars();}
+        if(profile.getNumbersAllowed()){this.passwordGeneratorService.withNumbers();}
+        if(profile.getUppercaseAllowed()){this.passwordGeneratorService.withUppercase();}
+        if(profile.getSpecialCharsAllowed()){this.passwordGeneratorService.withSpecialChars();}
         if(profile.getExcludedSpecialChars().length() != 0){this.passwordGeneratorService.excludeSpecialChars(profile.getExcludedSpecialChars());}
         return this.passwordGeneratorService.generate();
     }

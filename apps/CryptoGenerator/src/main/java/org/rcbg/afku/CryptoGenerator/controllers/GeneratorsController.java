@@ -1,6 +1,5 @@
 package org.rcbg.afku.CryptoGenerator.controllers;
 
-import com.nimbusds.common.contenttype.ContentType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.rcbg.afku.CryptoGenerator.dtos.*;
 import org.rcbg.afku.CryptoGenerator.responses.ResponseMetadata;
@@ -11,7 +10,6 @@ import org.rcbg.afku.CryptoGenerator.responses.password.PasswordResponseBuilder;
 import org.rcbg.afku.CryptoGenerator.services.GenerationService;
 import org.rcbg.afku.CryptoGenerator.services.ProfilesManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

@@ -36,6 +36,7 @@ public class PasswordGenerator implements IPasswordGenerator, IGenerator {
         this.specialCharsAllowed = false;
         this.excludedSpecialChars = "";
         this.generatorRules = new ArrayList<>();
+        this.generatorRules.add(new CharacterRule(EnglishCharacterData.LowerCase));
     }
 
     private String prepareSpecialCharsRule(){

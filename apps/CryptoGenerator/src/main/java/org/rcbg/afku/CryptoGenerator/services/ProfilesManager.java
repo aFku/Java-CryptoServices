@@ -16,12 +16,31 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
 @Service
+@Validated
 public class ProfilesManager {
 
     @Value("${crd.namespace}")
     private String namespace;
 
     private final static Logger logger = LoggerFactory.getLogger(ProfilesManager.class);
+
+    private PasswordProfileCR getPasswordProfileCR(String name){
+        PasswordProfileCR cr = K8sCrdClientFactory.getPasswordProfileClient().inNamespace(this.namespace).withName(name).get();
+        if(cr == null){
+            throw new ProfileNotFound("Password profile with name '" + name +"' cannot be found");
+        }
+        logger.debug("Got password profile from cluster: " + cr.toString());
+        return cr;
+    }
+
+    private AsymmetricKeysProfileCR getAsymmetricKeysProfileCR(String name){
+        AsymmetricKeysProfileCR cr = K8sCrdClientFactory.getAsymmetricKeysProfileClient().inNamespace(this.namespace).withName(name).get();
+        if(cr == null){
+            throw new ProfileNotFound("Asymmetric keys profile with name '" + name +"' cannot be found");
+        }
+        logger.debug("Got asymmetric keys profile from cluster: " + cr.toString());
+        return cr;
+    }
 
     @Validated
     public PasswordProfileDTO createProfile(@Valid PasswordProfileRequestBody requestBody, String userId){
@@ -42,32 +61,24 @@ public class ProfilesManager {
     }
 
     public PasswordProfileDTO getPasswordProfileByName(String name){
-        PasswordProfileCR cr = K8sCrdClientFactory.getPasswordProfileClient().inNamespace(this.namespace).withName(name).get();
-        if(cr == null){
-            throw new ProfileNotFound("Password profile with name '" + name +"' cannot be found");
-        }
-        PasswordProfileDTO dto = PasswordProfileMapper.INSTANCE.specToDto(cr.getSpec());
-        logger.debug("Got password profile from cluster: " + dto.toString());
-        return dto;
+        PasswordProfileCR cr = this.getPasswordProfileCR(name);
+        return PasswordProfileMapper.INSTANCE.specToDto(cr.getSpec());
     }
 
     public AsymmetricKeysProfileDTO getAsymmetricKeysProfileByName(String name){
-        AsymmetricKeysProfileCR cr = K8sCrdClientFactory.getAsymmetricKeysProfileClient().inNamespace(this.namespace).withName(name).get();
-        if(cr == null){
-            throw new ProfileNotFound("Asymmetric keys profile with name '" + name +"' cannot be found");
-        }
-        AsymmetricKeysProfileDTO dto = AsymmetricKeysProfileMapper.INSTANCE.specToDto(cr.getSpec());
-        logger.debug("Got keys profile from cluster: " + dto.toString());
-        return dto;
+        AsymmetricKeysProfileCR cr = this.getAsymmetricKeysProfileCR(name);
+        return AsymmetricKeysProfileMapper.INSTANCE.specToDto(cr.getSpec());
     }
 
     public void deletePasswordProfileByName(String name){
-        K8sCrdClientFactory.getPasswordProfileClient().inNamespace(this.namespace).withName(name).delete();
+        PasswordProfileCR cr = this.getPasswordProfileCR(name);
+        K8sCrdClientFactory.getPasswordProfileClient().inNamespace(this.namespace).resource(cr).delete();
         logger.info("Password profile with name: " + name + " has been deleted");
     }
 
     public void deleteAsymmetricKeysProfileByName(String name){
-        K8sCrdClientFactory.getAsymmetricKeysProfileClient().inNamespace(this.namespace).withName(name).delete();
+        AsymmetricKeysProfileCR cr = this.getAsymmetricKeysProfileCR(name);
+        K8sCrdClientFactory.getAsymmetricKeysProfileClient().inNamespace(this.namespace).resource(cr).delete();
         logger.info("Keys profile with name: " + name + " has been deleted");
     }
 
