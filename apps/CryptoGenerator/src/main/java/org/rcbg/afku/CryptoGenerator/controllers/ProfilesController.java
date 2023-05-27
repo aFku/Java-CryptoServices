@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
@@ -37,6 +38,7 @@ public class ProfilesController {
         return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
     @PostMapping(value = "passwords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createPasswordProfile(HttpServletRequest request, @RequestBody PasswordProfileRequestBody requestBody){
         PasswordProfileDTO dto = profilesManager.createProfile(requestBody, "exampleUser"); // TO DO: Add user identification
@@ -44,6 +46,7 @@ public class ProfilesController {
         return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
     @DeleteMapping(value = "passwords")
     public ResponseEntity<?> deletePasswordProfile(@RequestParam String profileName){
         profilesManager.deletePasswordProfileByName(profileName);
@@ -57,6 +60,7 @@ public class ProfilesController {
         return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
     @PostMapping(value = "asymmetrics", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAsymmetricKeysProfile(HttpServletRequest request, @RequestBody AsymmetricKeysProfileRequestBody requestBody){
         AsymmetricKeysProfileDTO dto = profilesManager.createProfile(requestBody, "exampleUser"); // TO DO: Add user identification
@@ -64,6 +68,7 @@ public class ProfilesController {
         return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
     @DeleteMapping(value = "asymmetrics")
     public ResponseEntity<?> deleteAsymmetricKeysProfile(@RequestParam String profileName){
         profilesManager.deleteAsymmetricKeysProfileByName(profileName);

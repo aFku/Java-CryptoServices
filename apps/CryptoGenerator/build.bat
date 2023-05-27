@@ -1,7 +1,7 @@
 dir
 echo y|rmdir /s target
 dir
-call mvn clean install
+call mvn clean install -DskipTests
 call docker build --tag cryptogenerator:"%1" .
 bash -c "minikube image load cryptogenerator:%1 -p dev-cluster"
 bash -c "minikube image ls -p dev-cluster | grep cryptogenerator:%1"
