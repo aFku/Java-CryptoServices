@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
@@ -40,8 +41,8 @@ public class ProfilesController {
 
     @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
     @PostMapping(value = "passwords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createPasswordProfile(HttpServletRequest request, @RequestBody PasswordProfileRequestBody requestBody){
-        PasswordProfileDTO dto = profilesManager.createProfile(requestBody, "exampleUser"); // TO DO: Add user identification
+    public ResponseEntity<?> createPasswordProfile(HttpServletRequest request, @RequestBody PasswordProfileRequestBody requestBody, Authentication authentication){
+        PasswordProfileDTO dto = profilesManager.createProfile(requestBody, authentication.getName());
         ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }
@@ -62,8 +63,8 @@ public class ProfilesController {
 
     @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
     @PostMapping(value = "asymmetrics", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createAsymmetricKeysProfile(HttpServletRequest request, @RequestBody AsymmetricKeysProfileRequestBody requestBody){
-        AsymmetricKeysProfileDTO dto = profilesManager.createProfile(requestBody, "exampleUser"); // TO DO: Add user identification
+    public ResponseEntity<?> createAsymmetricKeysProfile(HttpServletRequest request, @RequestBody AsymmetricKeysProfileRequestBody requestBody, Authentication authentication){
+        AsymmetricKeysProfileDTO dto = profilesManager.createProfile(requestBody, authentication.getName());
         ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
         return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
     }

@@ -3,7 +3,11 @@ package org.rcbg.afku.CryptoGenerator.integration_tests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
+import io.fabric8.kubernetes.client.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
+import org.rcbg.afku.CryptoGenerator.k8sClient.K8sCrdClientFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -13,19 +17,26 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
+import org.testcontainers.k3s.K3sContainer;
+import org.testcontainers.utility.DockerImageName;
 import java.util.HashMap;
 
 @Testcontainers
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class TestContainersBase {
 
     @Container
-    static KeycloakContainer keycloak;
+    protected static KeycloakContainer keycloak;
+    @Container
+    protected static K3sContainer k3s;
 
     static {
         keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:21.1.1")
                 .withRealmImportFile("/keycloak_realm.json");
+        keycloak.start();
+        k3s = new K3sContainer(DockerImageName.parse("rancher/k3s:v1.21.3-k3s1"));
+        k3sInit();
     }
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -63,5 +74,20 @@ public abstract class TestContainersBase {
             Assertions.fail("Cannot get JWT token, cannot parse response: " + response.getBody());
         }
         return null;
+    }
+
+    protected static void k3sInit(){
+        // Init testcontainer and get config
+        k3s.start();
+        String kubeConfigYaml = k3s.getKubeConfigYaml();
+        System.out.println(kubeConfigYaml);
+        Config config = Config.fromKubeconfig(kubeConfigYaml);
+
+        // Create all objects
+        try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
+            client.namespaces().load(TestContainersBase.class.getResourceAsStream("/namespace.yaml")).create();
+            client.apiextensions().v1().customResourceDefinitions().load(TestContainersBase.class.getResourceAsStream("/profiles-crd.yaml")).create();
+            K8sCrdClientFactory.getPasswordProfileClient(config).load(TestContainersBase.class.getResourceAsStream("/test-profile-cr.yaml")).create();
+        }
     }
 }

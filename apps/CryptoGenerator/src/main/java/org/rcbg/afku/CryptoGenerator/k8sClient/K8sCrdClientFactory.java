@@ -1,6 +1,7 @@
 package org.rcbg.afku.CryptoGenerator.k8sClient;
 
 import io.fabric8.kubernetes.api.model.KubernetesResourceList;
+import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
@@ -15,8 +16,18 @@ public class K8sCrdClientFactory {
         return client.resources(PasswordProfileCR.class);
     }
 
+    public static MixedOperation<PasswordProfileCR, KubernetesResourceList<PasswordProfileCR>, Resource<PasswordProfileCR>> getPasswordProfileClient(Config config){
+        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
+        return client.resources(PasswordProfileCR.class);
+    }
+
     public static MixedOperation<AsymmetricKeysProfileCR, KubernetesResourceList<AsymmetricKeysProfileCR>, Resource<AsymmetricKeysProfileCR>> getAsymmetricKeysProfileClient(){
         KubernetesClient client = new KubernetesClientBuilder().build();
+        return client.resources(AsymmetricKeysProfileCR.class);
+    }
+
+    public static MixedOperation<AsymmetricKeysProfileCR, KubernetesResourceList<AsymmetricKeysProfileCR>, Resource<AsymmetricKeysProfileCR>> getAsymmetricKeysProfileClient(Config config){
+        KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build();
         return client.resources(AsymmetricKeysProfileCR.class);
     }
 
