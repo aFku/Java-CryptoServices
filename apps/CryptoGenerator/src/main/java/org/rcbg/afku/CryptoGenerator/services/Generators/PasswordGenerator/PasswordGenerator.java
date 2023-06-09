@@ -25,7 +25,7 @@ public class PasswordGenerator implements IPasswordGenerator, IGenerator {
 
     List<CharacterRule> generatorRules;
 
-    private PasswordGenerator(){
+    public PasswordGenerator(){
         this.reset();
     }
 

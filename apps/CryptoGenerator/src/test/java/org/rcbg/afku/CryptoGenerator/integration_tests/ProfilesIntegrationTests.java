@@ -50,9 +50,7 @@ import java.util.HashMap;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@ContextConfiguration
-@ExtendWith(SpringExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProfilesIntegrationTests extends TestContainersBase{
 
     public PasswordProfileDTO createTestPasswordProfile(String name){

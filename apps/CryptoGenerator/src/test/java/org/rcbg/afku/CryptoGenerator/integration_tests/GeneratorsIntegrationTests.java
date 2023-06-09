@@ -8,6 +8,7 @@ import org.rcbg.afku.CryptoGenerator.dtos.AsymmetricKeysProfileRequestBody;
 import org.rcbg.afku.CryptoGenerator.dtos.PasswordProfileRequestBody;
 import org.rcbg.afku.CryptoGenerator.k8sClient.K8sCrdClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -19,6 +20,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class GeneratorsIntegrationTests extends TestContainersBase{
 
     @Test

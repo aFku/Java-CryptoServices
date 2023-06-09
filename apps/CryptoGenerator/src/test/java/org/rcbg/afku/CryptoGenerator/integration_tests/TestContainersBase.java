@@ -31,7 +31,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class TestContainersBase {
 
     @Container
