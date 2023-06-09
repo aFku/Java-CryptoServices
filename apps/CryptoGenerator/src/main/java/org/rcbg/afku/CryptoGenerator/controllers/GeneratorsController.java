@@ -1,6 +1,7 @@
 package org.rcbg.afku.CryptoGenerator.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.rcbg.afku.CryptoGenerator.dtos.*;
 import org.rcbg.afku.CryptoGenerator.responses.ResponseMetadata;
 import org.rcbg.afku.CryptoGenerator.responses.asymmetrickeys.KeysResponse;
@@ -13,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/generators")
 public class GeneratorsController {
@@ -41,8 +45,9 @@ public class GeneratorsController {
     }
 
     @PostMapping(value = "passwords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PasswordResponse> getPasswordWithGivenSpec(HttpServletRequest request, @RequestBody PasswordProfileRequestBody requestBody){
-        PasswordProfileDTO profileDTO = PasswordProfileMapper.INSTANCE.toFullDto(requestBody, "exampleUser"); // TO DO: user from jwt
+    public ResponseEntity<PasswordResponse> getPasswordWithGivenSpec(HttpServletRequest request, @RequestBody PasswordProfileRequestBody requestBody, Authentication authentication){
+        profilesManager.RequestBodyValidation(requestBody);
+        PasswordProfileDTO profileDTO = PasswordProfileMapper.INSTANCE.toFullDto(requestBody, authentication.getName());
         String password = generationService.generatePassword(profileDTO);
         return new PasswordResponseBuilder()
                 .withPassword(password)
@@ -65,8 +70,9 @@ public class GeneratorsController {
     }
 
     @PostMapping(value = "asymmetrics", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<KeysResponse> getAsymmetricKeysWithGivenSpec(HttpServletRequest request, @RequestBody AsymmetricKeysProfileRequestBody requestBody){
-        AsymmetricKeysProfileDTO profileDTO = AsymmetricKeysProfileMapper.INSTANCE.toFullDto(requestBody, "exampleUser"); // TO DO: user from JWT
+    public ResponseEntity<KeysResponse> getAsymmetricKeysWithGivenSpec(HttpServletRequest request, @RequestBody AsymmetricKeysProfileRequestBody requestBody, Authentication authentication){
+        profilesManager.RequestBodyValidation(requestBody);
+        AsymmetricKeysProfileDTO profileDTO = AsymmetricKeysProfileMapper.INSTANCE.toFullDto(requestBody, authentication.getName());
         String[] keys = generationService.generateKeys(profileDTO);
         return new KeysResponseBuilder()
                 .withKeys(keys[0], keys[1])

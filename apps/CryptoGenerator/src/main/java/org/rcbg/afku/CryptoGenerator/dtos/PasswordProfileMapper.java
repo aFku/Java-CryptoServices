@@ -1,5 +1,6 @@
 package org.rcbg.afku.CryptoGenerator.dtos;
 
+import jakarta.validation.Valid;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -9,6 +10,8 @@ import org.rcbg.afku.CryptoGenerator.k8sClient.models.PasswordProfile.PasswordPr
 import org.rcbg.afku.CryptoGenerator.services.ProfilesManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 
 @Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PasswordProfileMapper {

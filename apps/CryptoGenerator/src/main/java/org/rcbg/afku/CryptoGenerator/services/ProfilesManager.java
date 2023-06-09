@@ -11,6 +11,7 @@ import org.rcbg.afku.CryptoGenerator.k8sClient.models.PasswordProfile.PasswordPr
 import org.rcbg.afku.CryptoGenerator.k8sClient.models.PasswordProfile.PasswordProfileSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -22,10 +23,17 @@ public class ProfilesManager {
     @Value("${crd.namespace}")
     private String namespace;
 
+    private K8sCrdClientFactory k8sCrdClientFactory;
+
     private final static Logger logger = LoggerFactory.getLogger(ProfilesManager.class);
 
+    @Autowired
+    public ProfilesManager(K8sCrdClientFactory k8sCrdClientFactory){
+        this.k8sCrdClientFactory = k8sCrdClientFactory;
+    }
+
     private PasswordProfileCR getPasswordProfileCR(String name){
-        PasswordProfileCR cr = K8sCrdClientFactory.getPasswordProfileClient().inNamespace(this.namespace).withName(name).get();
+        PasswordProfileCR cr = k8sCrdClientFactory.passwordsClient().inNamespace(this.namespace).withName(name).get();
         if(cr == null){
             throw new ProfileNotFound("Password profile with name '" + name +"' cannot be found");
         }
@@ -34,7 +42,7 @@ public class ProfilesManager {
     }
 
     private AsymmetricKeysProfileCR getAsymmetricKeysProfileCR(String name){
-        AsymmetricKeysProfileCR cr = K8sCrdClientFactory.getAsymmetricKeysProfileClient().inNamespace(this.namespace).withName(name).get();
+        AsymmetricKeysProfileCR cr = k8sCrdClientFactory.asymmetricKeysClient().inNamespace(this.namespace).withName(name).get();
         if(cr == null){
             throw new ProfileNotFound("Asymmetric keys profile with name '" + name +"' cannot be found");
         }
@@ -45,7 +53,7 @@ public class ProfilesManager {
     @Validated
     public PasswordProfileDTO createProfile(@Valid PasswordProfileRequestBody requestBody, String userId){
         PasswordProfileCR cr = PasswordProfileMapper.INSTANCE.createProfileResource(requestBody, userId);
-        cr = K8sCrdClientFactory.getPasswordProfileClient().inNamespace(this.namespace).resource(cr).create();
+        cr = k8sCrdClientFactory.passwordsClient().inNamespace(this.namespace).resource(cr).create();
         PasswordProfileDTO dto = PasswordProfileMapper.INSTANCE.specToDto(cr.getSpec());
         logger.info("Password profile has been created: " + dto.toString());
         return dto;
@@ -54,7 +62,7 @@ public class ProfilesManager {
     @Validated
     public AsymmetricKeysProfileDTO createProfile(@Valid AsymmetricKeysProfileRequestBody requestBody, String userId){
         AsymmetricKeysProfileCR cr = AsymmetricKeysProfileMapper.INSTANCE.createProfileResource(requestBody, userId);
-        cr = K8sCrdClientFactory.getAsymmetricKeysProfileClient().inNamespace(this.namespace).resource(cr).create();
+        cr = k8sCrdClientFactory.asymmetricKeysClient().inNamespace(this.namespace).resource(cr).create();
         AsymmetricKeysProfileDTO dto = AsymmetricKeysProfileMapper.INSTANCE.specToDto(cr.getSpec());
         logger.info("Keys profile has been created: " + dto.toString());
         return dto;
@@ -72,15 +80,23 @@ public class ProfilesManager {
 
     public void deletePasswordProfileByName(String name){
         PasswordProfileCR cr = this.getPasswordProfileCR(name);
-        K8sCrdClientFactory.getPasswordProfileClient().inNamespace(this.namespace).resource(cr).delete();
+        k8sCrdClientFactory.passwordsClient().inNamespace(this.namespace).resource(cr).delete();
         logger.info("Password profile with name: " + name + " has been deleted");
     }
 
     public void deleteAsymmetricKeysProfileByName(String name){
         AsymmetricKeysProfileCR cr = this.getAsymmetricKeysProfileCR(name);
-        K8sCrdClientFactory.getAsymmetricKeysProfileClient().inNamespace(this.namespace).resource(cr).delete();
+        k8sCrdClientFactory.asymmetricKeysClient().inNamespace(this.namespace).resource(cr).delete();
         logger.info("Keys profile with name: " + name + " has been deleted");
     }
 
+    @Validated
+    public boolean RequestBodyValidation(@Valid PasswordProfileRequestBody requestBody){
+        return true;
+    }
 
+    @Validated
+    public boolean RequestBodyValidation(@Valid AsymmetricKeysProfileRequestBody requestBody){
+        return true;
+    }
 }
