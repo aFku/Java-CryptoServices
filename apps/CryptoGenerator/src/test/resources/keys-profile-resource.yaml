@@ -1,0 +1,13 @@
+apiVersion: org.rcbg/v1
+kind: AsymmetricKeysProfile
+metadata:
+  name: profile1
+  namespace: generation-service
+spec:
+  profileMetadata:
+    profileName: "profile1"
+    creationTimestamp: "2023-04-04T17:05:47+00:00"
+    creatorUserId: "creator-name"
+  profileProperties:
+    algorithm: "DSA"
+    returnBase64: true
