@@ -55,27 +55,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 public class ProfilesIntegrationTests extends TestContainersBase{
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
-
-    @Autowired
-    private ProfilesManager profilesManager;
-
-    @Autowired
-    private K8sCrdClientFactory k8sCrdClientFactory;
-
-    private ObjectMapper mapper;
-
-    @BeforeEach
-    public void setup(){
-        mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).apply(springSecurity()).build();
-        k8sCrdClientFactory = new K8sCrdClientFactory(config);
-        ReflectionTestUtils.setField(profilesManager, "k8sCrdClientFactory", k8sCrdClientFactory);
-        this.mapper = new ObjectMapper();
-    }
-
     public PasswordProfileDTO createTestPasswordProfile(String name){
         PasswordProfileRequestBody data = new PasswordProfileRequestBody();
         data.setProfileName(name);
@@ -104,6 +83,15 @@ public class ProfilesIntegrationTests extends TestContainersBase{
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.profileMetadata.profileName").value(profileName))
                 .andExpect(jsonPath("$.data.profileProperties.length").value(16));
+    }
+
+    @Test
+    public void testGetPasswordProfileByNameAuthFail() throws Exception {
+        String jwt = obtainJwtToken(KeycloakUser.GENERATORUSER1);
+        String profileName = "profile1";
+
+        mockMvc.perform(get("/api/v1/profiles/passwords").param("profileName", profileName).header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt))
+                .andExpect(status().isForbidden());
     }
 
     @Test

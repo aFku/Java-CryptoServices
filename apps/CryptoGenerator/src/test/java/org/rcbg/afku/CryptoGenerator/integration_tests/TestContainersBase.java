@@ -5,20 +5,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.fabric8.kubernetes.client.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.rcbg.afku.CryptoGenerator.k8sClient.K8sCrdClientFactory;
+import org.rcbg.afku.CryptoGenerator.services.ProfilesManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.k3s.K3sContainer;
 import org.testcontainers.utility.DockerImageName;
 import java.util.HashMap;
+
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -47,6 +56,28 @@ public abstract class TestContainersBase {
     protected String keycloakGeneratorClientId = "cryptogenerator";
     protected String keycloakGrantType = "password";
     protected String keycloakAuthEndpointUrl = keycloak.getAuthServerUrl() + "realms/cryptoservices/protocol/openid-connect/token";
+
+    protected MockMvc mockMvc;
+
+    @Autowired
+    protected ProfilesManager profilesManager;
+
+    @Autowired
+    protected K8sCrdClientFactory k8sCrdClientFactory;
+
+    @Autowired
+    protected WebApplicationContext webApplicationContext;
+
+    protected ObjectMapper mapper;
+
+    @BeforeEach
+    protected void setup(){
+        mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).apply(springSecurity()).build();
+        k8sCrdClientFactory = new K8sCrdClientFactory(config);
+        ReflectionTestUtils.setField(profilesManager, "k8sCrdClientFactory", k8sCrdClientFactory);
+        this.mapper = new ObjectMapper();
+    }
+
 
     @DynamicPropertySource
     static void registerResourceServerIssuerProperty(DynamicPropertyRegistry registry){

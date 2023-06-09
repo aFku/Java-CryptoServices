@@ -90,5 +90,13 @@ public class ProfilesManager {
         logger.info("Keys profile with name: " + name + " has been deleted");
     }
 
+    @Validated
+    public boolean RequestBodyValidation(@Valid PasswordProfileRequestBody requestBody){
+        return true;
+    }
 
+    @Validated
+    public boolean RequestBodyValidation(@Valid AsymmetricKeysProfileRequestBody requestBody){
+        return true;
+    }
 }
