@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import io.fabric8.kubernetes.client.*;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.rcbg.afku.CryptoGenerator.k8sClient.K8sCrdClientFactory;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +29,8 @@ public abstract class TestContainersBase {
     protected static KeycloakContainer keycloak;
     @Container
     protected static K3sContainer k3s;
+
+    protected static Config config;
 
     static {
         keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:21.1.1")
@@ -81,13 +82,16 @@ public abstract class TestContainersBase {
         k3s.start();
         String kubeConfigYaml = k3s.getKubeConfigYaml();
         System.out.println(kubeConfigYaml);
-        Config config = Config.fromKubeconfig(kubeConfigYaml);
+        config = Config.fromKubeconfig(kubeConfigYaml);
+        K8sCrdClientFactory k8sCrdClientFactory = new K8sCrdClientFactory(config);
 
         // Create all objects
         try (KubernetesClient client = new KubernetesClientBuilder().withConfig(config).build()) {
             client.namespaces().load(TestContainersBase.class.getResourceAsStream("/namespace.yaml")).create();
-            client.apiextensions().v1().customResourceDefinitions().load(TestContainersBase.class.getResourceAsStream("/profiles-crd.yaml")).create();
-            K8sCrdClientFactory.getPasswordProfileClient(config).load(TestContainersBase.class.getResourceAsStream("/test-profile-cr.yaml")).create();
+            client.apiextensions().v1().customResourceDefinitions().load(TestContainersBase.class.getResourceAsStream("/password-profile-crd.yaml")).create();
+            k8sCrdClientFactory.passwordsClient().load(TestContainersBase.class.getResourceAsStream("/password-profile-resource.yaml")).create();
+            client.apiextensions().v1().customResourceDefinitions().load(TestContainersBase.class.getResourceAsStream("/keys-profile-crd.yaml")).create();
+            k8sCrdClientFactory.asymmetricKeysClient().load(TestContainersBase.class.getResourceAsStream("/keys-profile-resource.yaml")).create();
         }
     }
 }

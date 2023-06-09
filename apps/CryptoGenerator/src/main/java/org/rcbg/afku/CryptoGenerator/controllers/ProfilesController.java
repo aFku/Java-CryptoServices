@@ -44,7 +44,7 @@ public class ProfilesController {
     public ResponseEntity<?> createPasswordProfile(HttpServletRequest request, @RequestBody PasswordProfileRequestBody requestBody, Authentication authentication){
         PasswordProfileDTO dto = profilesManager.createProfile(requestBody, authentication.getName());
         ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
-        return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(new PasswordProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
@@ -66,7 +66,7 @@ public class ProfilesController {
     public ResponseEntity<?> createAsymmetricKeysProfile(HttpServletRequest request, @RequestBody AsymmetricKeysProfileRequestBody requestBody, Authentication authentication){
         AsymmetricKeysProfileDTO dto = profilesManager.createProfile(requestBody, authentication.getName());
         ResponseMetadata metadata = new ResponseMetadata(request.getRequestURI(), HttpStatus.OK.value(), MediaType.APPLICATION_JSON_VALUE);
-        return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.OK);
+        return new ResponseEntity<>(new KeysProfileResponse(dto, metadata), new HttpHeaders(), HttpStatus.CREATED);
     }
 
     @PreAuthorize("hasAuthority('ROLE_GeneratorsProfilesAdmin')")
