@@ -20,8 +20,8 @@ public class Password {
     private Integer passwordId;
 
     private String ownerUserId;
-    private String password;
-    private String name;
-    private String description;
-    private String key;
+    private String encryptedPassword;
+    private String passwordName;
+    private String passwordDescription;
+    private String secretKey;
 }

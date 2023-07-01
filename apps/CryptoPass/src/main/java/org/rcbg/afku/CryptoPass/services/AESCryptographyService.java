@@ -1,13 +1,13 @@
 package org.rcbg.afku.CryptoPass.services;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -20,10 +20,15 @@ import java.util.Base64;
 @Service
 public class AESCryptographyService {
 
-    private SecretKeyFactory keyFactory;
+    private final SecretKeyFactory keyFactory;
 
     @Value("${encryption.iv-length}")
     private int ivLength;
+
+    @Value("${bcrypt-service.salt.log-rounds}")
+    private int saltLogRounds;
+
+    private final int bcryptSaltLength = 16; // 128 bits = 16 bytes
 
     public AESCryptographyService() throws NoSuchAlgorithmException {
         this.keyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
@@ -35,8 +40,8 @@ public class AESCryptographyService {
         return new IvParameterSpec(iv);
     }
 
-    private SecretKey getSecretFromPassword(String password) throws InvalidKeySpecException {
-        KeySpec spec = new PBEKeySpec(password.toCharArray());
+    private SecretKey getSecretFromPassword(String password, String salt) throws InvalidKeySpecException {
+        KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
         return new SecretKeySpec(this.keyFactory.generateSecret(spec).getEncoded(), "AES");
     }
 
@@ -44,27 +49,31 @@ public class AESCryptographyService {
             InvalidKeySpecException, NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException,
             IllegalBlockSizeException, BadPaddingException {
+
         IvParameterSpec ivParameterSpec = this.generateIv();
-        SecretKey key = getSecretFromPassword(passwordBase);
-        Cipher cipher = Cipher.getInstance("CBC");
+        String salt = BCrypt.gensalt(saltLogRounds);
+        String base64Iv = Base64.getEncoder().encodeToString(ivParameterSpec.getIV());
+        String base64Salt = Base64.getEncoder().encodeToString(salt.getBytes());
+
+        SecretKey key = getSecretFromPassword(passwordBase, salt);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
 
         byte[] cipherText = cipher.doFinal(data.getBytes());
-        byte[] cipherTextWithIv = new byte[this.ivLength + cipherText.length];
-        System.arraycopy(ivParameterSpec.getIV(), 0, cipherTextWithIv, 0, this.ivLength);
-        System.arraycopy(cipherText, 0, cipherTextWithIv, this.ivLength, cipherTextWithIv.length);
-        return Base64.getEncoder().encodeToString(cipherTextWithIv);
+        String base64CipherText = Base64.getEncoder().encodeToString(cipherText);
+
+        return base64Salt + "." + base64Iv + "." + base64CipherText;
     }
 
-    public String decryptePassword(String data, String passwordBase) throws NoSuchPaddingException,
+    public String decryptPassword(String data, String passwordBase) throws NoSuchPaddingException,
             NoSuchAlgorithmException, InvalidKeySpecException, InvalidAlgorithmParameterException,
             InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-        byte[] rawData = Base64.getDecoder().decode(data);
-        byte[] iv = Arrays.copyOfRange(rawData, 0, this.ivLength);
-        byte[] cipherText = Arrays.copyOfRange(rawData, this.ivLength, rawData.length);
-
-        Cipher cipher = Cipher.getInstance("CBC");
-        cipher.init(Cipher.DECRYPT_MODE, getSecretFromPassword(passwordBase), new IvParameterSpec(iv));
+        String[] rawData = data.split("\\.");
+        byte[] salt = Base64.getDecoder().decode(rawData[0]);
+        byte[] iv = Base64.getDecoder().decode(rawData[1]);
+        byte[] cipherText = Base64.getDecoder().decode(rawData[2]);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, getSecretFromPassword(passwordBase, new String(salt)), new IvParameterSpec(iv));
 
         return new String(cipher.doFinal(cipherText));
     }
