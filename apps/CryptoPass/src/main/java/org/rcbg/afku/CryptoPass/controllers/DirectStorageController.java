@@ -1,11 +1,17 @@
 package org.rcbg.afku.CryptoPass.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.coyote.Response;
 import org.rcbg.afku.CryptoPass.dto.FullFetchResponseDto;
 import org.rcbg.afku.CryptoPass.dto.PasswordSaveRequestDto;
 import org.rcbg.afku.CryptoPass.dto.SafeFetchResponseDto;
+import org.rcbg.afku.CryptoPass.responses.FullFetchResponse;
+import org.rcbg.afku.CryptoPass.responses.ResponseFactory;
+import org.rcbg.afku.CryptoPass.responses.SafeFetchResponse;
+import org.rcbg.afku.CryptoPass.responses.SafePaginationResponse;
 import org.rcbg.afku.CryptoPass.services.PasswordManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/passwords")
-public class DirectStorageController { // TODO: Factory for responses
+public class DirectStorageController {
 
     private final PasswordManagementService managementService;
 
@@ -26,25 +32,25 @@ public class DirectStorageController { // TODO: Factory for responses
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUserPasswords(Pageable pageable){ // TODO: Auth - get userID
-        List<SafeFetchResponseDto> listOfPasswords = managementService.getListOfPasswords("{PLACEHOLDER}", pageable).getContent();
-        return new ResponseEntity<>(listOfPasswords, new HttpHeaders(), HttpStatus.OK);
+    public ResponseEntity<SafePaginationResponse> getAllUserPasswords(HttpServletRequest request, Pageable pageable){ // TODO: Auth - get userID
+        Page<SafeFetchResponseDto> pageOfPasswords = managementService.getListOfPasswords("{PLACEHOLDER}", pageable);
+        return ResponseFactory.createSafePaginationResponse(request.getRequestURI(), HttpStatus.OK, pageOfPasswords);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSpecificPasswordByID(@PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key) { // TODO: Auth
-        var dto = managementService.getPassword(id, key, "{PLACEHOLDER}");
-        return new ResponseEntity<>(dto, new HttpHeaders(), HttpStatus.OK);
+    public ResponseEntity<FullFetchResponse> getSpecificPasswordByID(HttpServletRequest request, @PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key) { // TODO: Auth
+        FullFetchResponseDto dto = managementService.getPassword(id, key, "{PLACEHOLDER}");
+        return ResponseFactory.createFullFetchResponse(request.getRequestURI(), HttpStatus.OK, dto);
     }
 
     @PostMapping
-    public ResponseEntity<?> savePassword(@RequestBody PasswordSaveRequestDto requestDto){ // TODO: Auth
-        var responseDto = managementService.savePassword(requestDto, "{PLACEHOLDER}");
-        return new ResponseEntity<>(responseDto, new HttpHeaders(), HttpStatus.OK);
+    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto){ // TODO: Auth
+        SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, "{PLACEHOLDER}");
+        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePassword(@PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key){ // TODO: Auth
+    public ResponseEntity<Void> deletePassword(HttpServletRequest request, @PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key){ // TODO: Auth
         managementService.deletePassword(id, key, "{PLACEHOLDER}");
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.NO_CONTENT);
     }

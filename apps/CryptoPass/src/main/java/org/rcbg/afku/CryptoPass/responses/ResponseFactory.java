@@ -1,5 +1,6 @@
 package org.rcbg.afku.CryptoPass.responses;
 
+import org.rcbg.afku.CryptoPass.dto.FullFetchResponseDto;
 import org.rcbg.afku.CryptoPass.dto.SafeFetchResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,7 @@ public class ResponseFactory {
         return new ResponseEntity<>(response, new HttpHeaders(), status);
     }
 
-    public static ResponseEntity<FullFetchResponse> createFullFetchResponse(String uri, HttpStatus status, FullFetchResponse data){
+    public static ResponseEntity<FullFetchResponse> createFullFetchResponse(String uri, HttpStatus status, FullFetchResponseDto data){
         MetaData metaData = new MetaData();
         metaData.setUri(uri);
         metaData.setContentType("object");
@@ -45,7 +46,7 @@ public class ResponseFactory {
         return new ResponseEntity<>(response, new HttpHeaders(), status);
     }
 
-    public static ResponseEntity<ErrorResponse> createSafeFetchResponse(String uri, HttpStatus status, List<String> messages){
+    public static ResponseEntity<ErrorResponse> createErrorResponse(String uri, HttpStatus status, List<String> messages){
         MetaData metaData = new MetaData();
         metaData.setUri(uri);
         metaData.setContentType("object");
