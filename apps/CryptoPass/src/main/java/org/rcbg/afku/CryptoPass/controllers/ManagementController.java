@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -34,43 +35,43 @@ public class ManagementController {
     }
 
     @GetMapping
-    public ResponseEntity<SafePaginationResponse> getAllUserPasswords(HttpServletRequest request, Pageable pageable){ // TODO: Auth - get userID
-        Page<SafeFetchResponseDto> pageOfPasswords = managementService.getListOfPasswords("{PLACEHOLDER}", pageable);
+    public ResponseEntity<SafePaginationResponse> getAllUserPasswords(HttpServletRequest request, Pageable pageable, Authentication authentication){
+        Page<SafeFetchResponseDto> pageOfPasswords = managementService.getListOfPasswords(authentication.getName(), pageable);
         return ResponseFactory.createSafePaginationResponse(request.getRequestURI(), HttpStatus.OK, pageOfPasswords);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FullFetchResponse> getSpecificPasswordByID(HttpServletRequest request, @PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key) { // TODO: Auth
-        FullFetchResponseDto dto = managementService.getPassword(id, key, "{PLACEHOLDER}");
+    public ResponseEntity<FullFetchResponse> getSpecificPasswordByID(HttpServletRequest request, @PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key, Authentication authentication) {
+        FullFetchResponseDto dto = managementService.getPassword(id, key, authentication.getName());
         return ResponseFactory.createFullFetchResponse(request.getRequestURI(), HttpStatus.OK, dto);
     }
 
     @PostMapping
-    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto){ // TODO: Auth
-        SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, "{PLACEHOLDER}");
+    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, Authentication authentication){
+        SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, authentication.getName());
         return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePassword(HttpServletRequest request, @PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key){ // TODO: Auth
-        managementService.deletePassword(id, key, "{PLACEHOLDER}");
+    public ResponseEntity<Void> deletePassword(HttpServletRequest request, @PathVariable int id, @RequestHeader("ENCRYPTION-KEY") String key, Authentication authentication){
+        managementService.deletePassword(id, key, authentication.getName());
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.NO_CONTENT);
     }
 
     @PostMapping
-    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordGenerationSaveRequestDto requestDto){ // TODO: Auth
-        String password = generatorClientService.generatePasswordWithProperties("{PLACEHOLDER}", requestDto.getProperties());
+    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordGenerationSaveRequestDto requestDto, Authentication authentication){
+        String password = generatorClientService.generatePasswordWithProperties(request.getHeader("Authentication"), requestDto.getProperties());
         PasswordSaveRequestDto passwordData = requestDto.getPasswordData();
         passwordData.setPassword(password);
-        SafeFetchResponseDto responseDto = managementService.savePassword(passwordData, "{PLACEHOLDER}");
+        SafeFetchResponseDto responseDto = managementService.savePassword(passwordData, authentication.getName());
         return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
     }
 
     @PostMapping
-    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, @RequestParam("profileName") String profileName){ // TODO: Auth
-        String password = generatorClientService.generatePasswordWithProfileName("{PLACEHOLDER}", profileName);
+    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, @RequestParam("profileName") String profileName, Authentication authentication){
+        String password = generatorClientService.generatePasswordWithProfileName(request.getHeader("Authentication"), profileName);
         requestDto.setPassword(password);
-        SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, "{PLACEHOLDER}");
+        SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, authentication.getName());
         return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
     }
 }
