@@ -1,6 +1,7 @@
 package org.rcbg.afku.CryptoPass.dto;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

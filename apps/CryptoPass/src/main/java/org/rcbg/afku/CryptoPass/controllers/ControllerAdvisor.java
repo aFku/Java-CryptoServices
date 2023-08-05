@@ -4,9 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ConstraintViolation;
 import lombok.extern.slf4j.Slf4j;
-import org.rcbg.afku.CryptoPass.exceptions.PasswordAccessDenied;
-import org.rcbg.afku.CryptoPass.exceptions.PasswordInternalError;
-import org.rcbg.afku.CryptoPass.exceptions.PasswordNotFound;
+import org.rcbg.afku.CryptoPass.exceptions.*;
 import org.rcbg.afku.CryptoPass.responses.ErrorResponse;
 import org.rcbg.afku.CryptoPass.responses.ResponseFactory;
 import org.springframework.http.HttpHeaders;
@@ -46,5 +44,14 @@ public class ControllerAdvisor {
         List<String> messages = ex.getConstraintViolations().stream().map(ConstraintViolation::getMessage).toList();
         log.error("ConstraintViolationException: " + messages.toString());
         return ResponseFactory.createErrorResponse(request.getRequestURI(), HttpStatus.BAD_REQUEST, messages);
+    }
+
+    @ExceptionHandler({GeneratorClientException.class, GeneratorServerException.class})
+    public ResponseEntity<ErrorResponse> generatorExceptionHandler(GeneratorBaseException ex, HttpServletRequest request){
+        String content = "{TargetURL: " + ex.getTargetUrl() + ", Status: " + ex.getStatus() + ", Body: " + ex.getResponseBody().toString() + "}";
+        log.error(ex.getClass().getSimpleName() + ": " + content);
+        String message = "Http client occurred an error: " + ex.getResponseBody().toString();
+        HttpStatus status = ex.getStatus().is4xxClientError() ? HttpStatus.BAD_REQUEST : HttpStatus.INTERNAL_SERVER_ERROR;
+        return ResponseFactory.createErrorResponse(request.getRequestURI(), status, new ArrayList<>(Collections.singleton(message)));
     }
 }

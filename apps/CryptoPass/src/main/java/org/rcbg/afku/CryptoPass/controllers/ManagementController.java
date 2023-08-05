@@ -1,14 +1,15 @@
 package org.rcbg.afku.CryptoPass.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.coyote.Response;
 import org.rcbg.afku.CryptoPass.dto.FullFetchResponseDto;
+import org.rcbg.afku.CryptoPass.dto.PasswordGenerationSaveRequestDto;
 import org.rcbg.afku.CryptoPass.dto.PasswordSaveRequestDto;
 import org.rcbg.afku.CryptoPass.dto.SafeFetchResponseDto;
 import org.rcbg.afku.CryptoPass.responses.FullFetchResponse;
 import org.rcbg.afku.CryptoPass.responses.ResponseFactory;
 import org.rcbg.afku.CryptoPass.responses.SafeFetchResponse;
 import org.rcbg.afku.CryptoPass.responses.SafePaginationResponse;
+import org.rcbg.afku.CryptoPass.services.GeneratorClientService;
 import org.rcbg.afku.CryptoPass.services.PasswordManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,17 +19,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/passwords")
-public class DirectStorageController {
+public class ManagementController {
 
     private final PasswordManagementService managementService;
 
+    private final GeneratorClientService generatorClientService;
+
     @Autowired
-    public DirectStorageController(PasswordManagementService managementService){
+    public ManagementController(PasswordManagementService managementService, GeneratorClientService generatorClientService){
         this.managementService = managementService;
+        this.generatorClientService = generatorClientService;
     }
 
     @GetMapping
@@ -55,5 +57,20 @@ public class DirectStorageController {
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping
+    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordGenerationSaveRequestDto requestDto){ // TODO: Auth
+        String password = generatorClientService.generatePasswordWithProperties("{PLACEHOLDER}", requestDto.getProperties());
+        PasswordSaveRequestDto passwordData = requestDto.getPasswordData();
+        passwordData.setPassword(password);
+        SafeFetchResponseDto responseDto = managementService.savePassword(passwordData, "{PLACEHOLDER}");
+        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
+    }
 
+    @PostMapping
+    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, @RequestParam("profileName") String profileName){ // TODO: Auth
+        String password = generatorClientService.generatePasswordWithProfileName("{PLACEHOLDER}", profileName);
+        requestDto.setPassword(password);
+        SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, "{PLACEHOLDER}");
+        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
+    }
 }
