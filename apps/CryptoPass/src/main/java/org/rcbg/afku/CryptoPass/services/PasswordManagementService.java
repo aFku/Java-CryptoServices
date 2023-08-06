@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.rcbg.afku.CryptoPass.dto.FullFetchResponseDto;
 import org.rcbg.afku.CryptoPass.dto.PasswordSaveRequestDto;
 import org.rcbg.afku.CryptoPass.dto.SafeFetchResponseDto;
-import org.rcbg.afku.CryptoPass.dto.groups.OnDirectSaving;
 import org.rcbg.afku.CryptoPass.exceptions.PasswordAccessDenied;
 import org.rcbg.afku.CryptoPass.exceptions.PasswordInternalError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,7 @@ public class PasswordManagementService {
         log.info("Access granted to password ID: " + data.getPasswordId() + " for user ID: " + ownerUserId);
     }
 
-    @Validated(OnDirectSaving.class)
+    @Validated
     public SafeFetchResponseDto savePassword(@Valid PasswordSaveRequestDto dto, String ownerUserId){
         try {
             String hashedKey = this.keyHashingService.hashPassword(dto.getKey());
