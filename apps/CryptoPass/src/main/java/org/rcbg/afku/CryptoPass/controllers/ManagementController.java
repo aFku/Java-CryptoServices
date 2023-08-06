@@ -47,7 +47,7 @@ public class ManagementController {
     }
 
     @PostMapping
-    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, Authentication authentication){
+    public ResponseEntity<SafeFetchResponse> savePasswordDirectly(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, Authentication authentication){
         SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, authentication.getName());
         return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
     }
@@ -58,8 +58,8 @@ public class ManagementController {
         return new ResponseEntity<>(new HttpHeaders(), HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping
-    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordGenerationSaveRequestDto requestDto, Authentication authentication){
+    @PostMapping("/properties")
+    public ResponseEntity<SafeFetchResponse> savePasswordWithProperties(HttpServletRequest request, @RequestBody PasswordGenerationSaveRequestDto requestDto, Authentication authentication){
         String password = generatorClientService.generatePasswordWithProperties(request.getHeader("Authentication"), requestDto.getProperties());
         PasswordSaveRequestDto passwordData = requestDto.getPasswordData();
         passwordData.setPassword(password);
@@ -67,8 +67,8 @@ public class ManagementController {
         return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
     }
 
-    @PostMapping
-    public ResponseEntity<SafeFetchResponse> savePassword(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, @RequestParam("profileName") String profileName, Authentication authentication){
+    @PostMapping("/profiles")
+    public ResponseEntity<SafeFetchResponse> savePasswordWithProfileName(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, @RequestParam("profileName") String profileName, Authentication authentication){
         String password = generatorClientService.generatePasswordWithProfileName(request.getHeader("Authentication"), profileName);
         requestDto.setPassword(password);
         SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, authentication.getName());

@@ -27,7 +27,8 @@ public class SecurityConfig{
         http.oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverterForKeycloak());
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.csrf().disable();
-        http.authorizeHttpRequests().requestMatchers("/api/v1/api/v1/passwords/**").hasAuthority("ROLE_PassUser");
+        http.authorizeHttpRequests().requestMatchers("/api/v1/passwords").hasAuthority("ROLE_PassUser");
+        http.authorizeHttpRequests().requestMatchers("/api/v1/passwords/**").hasAuthority("ROLE_PassUser");
         http.authorizeHttpRequests().anyRequest().denyAll();
         return http.build();
     }
