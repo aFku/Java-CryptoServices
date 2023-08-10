@@ -18,6 +18,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.HashMap;
 
+// Add mockserver for feign client
+
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TestContainersBase {
@@ -49,6 +51,13 @@ public class TestContainersBase {
     static void registerResourceServerIssuerProperty(DynamicPropertyRegistry registry){
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> keycloak.getAuthServerUrl() + "realms/cryptopass");
         registry.add("spring.security.oauth2.resourceserver.jwt.jwk-set-uri", () -> keycloak.getAuthServerUrl() + "realms/cryptopass/protocol/openid-connect/certs");
+    }
+
+    @DynamicPropertySource
+    static void registerMockServerProperties(DynamicPropertyRegistry registry){
+        String url = "http://localhost:" + WireMockConfig.getPort() + "/api/v1";
+        registry.add("generator.service.url", () -> url); // Wiremock
+        registry.add("crypto-services.cryptogenerator.url", () -> url); // Feign
     }
     private final RestTemplate restTemplate = new RestTemplate();
 
