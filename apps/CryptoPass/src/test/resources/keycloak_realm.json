@@ -919,43 +919,7 @@
       }
     } ],
     "defaultClientScopes" : [ "web-origins", "acr", "roles", "email" ],
-    "optionalClientScopes" : [ "address", "offline_access", "microprofile-jwt" ],
-    "authorizationSettings" : {
-      "allowRemoteResourceManagement" : true,
-      "policyEnforcementMode" : "ENFORCING",
-      "resources" : [ {
-        "name" : "Default Resource",
-        "type" : "urn:cryptopass:resources:default",
-        "ownerManagedAccess" : false,
-        "attributes" : { },
-        "_id" : "909e8080-9ce0-4d40-8cf3-326741748976",
-        "uris" : [ "/*" ]
-      } ],
-      "policies" : [ {
-        "id" : "82d4284a-a82a-4cb3-a677-fbd92a1a66da",
-        "name" : "Default Policy",
-        "description" : "A policy that grants access only for users within this realm",
-        "type" : "js",
-        "logic" : "POSITIVE",
-        "decisionStrategy" : "AFFIRMATIVE",
-        "config" : {
-          "code" : "// by default, grants any permission associated with this policy\n$evaluation.grant();\n"
-        }
-      }, {
-        "id" : "1859478b-85dc-4430-8dd3-ffd25c376b5b",
-        "name" : "Default Permission",
-        "description" : "A permission that applies to the default resource type",
-        "type" : "resource",
-        "logic" : "POSITIVE",
-        "decisionStrategy" : "UNANIMOUS",
-        "config" : {
-          "defaultResourceType" : "urn:cryptopass:resources:default",
-          "applyPolicies" : "[\"Default Policy\"]"
-        }
-      } ],
-      "scopes" : [ ],
-      "decisionStrategy" : "UNANIMOUS"
-    }
+    "optionalClientScopes" : [ "address", "offline_access", "microprofile-jwt" ]
   }, {
     "id" : "0776fddf-3183-4ef7-92a6-60f259387ae0",
     "clientId" : "realm-management",
