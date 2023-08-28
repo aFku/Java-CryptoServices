@@ -551,7 +551,14 @@
     "emailVerified" : false,
     "firstName" : "",
     "lastName" : "",
-    "credentials" : [ ],
+    "credentials" : [ {
+      "id" : "b98e923b-8f9e-4260-8b30-8d7efb21241f",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1693221691517,
+      "secretData" : "{\"value\":\"uRnRncPDu3JxSv/8KFgYnvzgZsQ7C1lVZ749O0/NEhc=\",\"salt\":\"l1htweuf/o4lWk2aHT6qPA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
     "realmRoles" : [ "default-roles-cryptoservices" ],

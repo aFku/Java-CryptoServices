@@ -2,10 +2,13 @@ package org.rcbg.afku.CryptoPass.integration_tests;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.tomakehurst.wiremock.WireMockServer;
 import dasniko.testcontainers.keycloak.KeycloakContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
+import org.rcbg.afku.CryptoPass.domain.PasswordRepository;
+import org.rcbg.afku.CryptoPass.services.PasswordGeneratorClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -54,6 +57,15 @@ public class TestContainersBase {
         mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).apply(springSecurity()).build();
         this.mapper = new ObjectMapper();
     }
+
+    @Autowired
+    protected PasswordRepository passwordRepository;
+
+    @Autowired
+    protected WireMockServer mockPasswordService;
+
+    @Autowired
+    protected PasswordGeneratorClient passwordGeneratorClient;
 
     @DynamicPropertySource
     static void registerMySQLProperties(DynamicPropertyRegistry registry){
