@@ -1,4 +1,4 @@
-package org.rcbg.afku.CryptoPass.integration_tests;
+package org.rcbg.afku.CryptoPass.integration_tests.utils;
 
 public enum KeycloakUser {
     PASSUSER1("5298afc5-574c-485f-ae7a-709aef7856f1"), // Generators + Storage

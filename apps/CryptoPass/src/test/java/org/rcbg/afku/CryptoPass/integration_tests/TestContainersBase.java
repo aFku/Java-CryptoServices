@@ -7,12 +7,21 @@ import dasniko.testcontainers.keycloak.KeycloakContainer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.rcbg.afku.CryptoPass.domain.PasswordRepository;
+import org.rcbg.afku.CryptoPass.dto.PasswordSaveRequestDto;
+import org.rcbg.afku.CryptoPass.dto.SafeFetchResponseDto;
+import org.rcbg.afku.CryptoPass.integration_tests.utils.KeycloakUser;
+import org.rcbg.afku.CryptoPass.integration_tests.utils.WireMockConfig;
 import org.rcbg.afku.CryptoPass.services.PasswordGeneratorClient;
+import org.rcbg.afku.CryptoPass.services.PasswordManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.*;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
@@ -30,13 +39,16 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 // Add mockserver for feign client
 
 @Testcontainers
+@ExtendWith(SpringExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TestContainersBase {
-    @Container
-    protected static KeycloakContainer keycloak;
+@ContextConfiguration(classes = { WireMockConfig.class })
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public abstract class TestContainersBase {
 
-    @Container
-    protected static MySQLContainer<?> mysql;
+    protected static final KeycloakContainer keycloak;
+
+
+    protected static final MySQLContainer<?> mysql;
 
     static {
         mysql = new MySQLContainer<>("mysql:latest")
@@ -128,5 +140,23 @@ public class TestContainersBase {
                 "\"description\": \"" + description + "\"," +
                 "\"key\": \"" + key + "\"" +
                 "}";
+    }
+
+    @Autowired
+    protected PasswordManagementService managementService;
+
+    protected SafeFetchResponseDto createPasswordInStorage(String password, String key, String name, String description, String userId) {
+        PasswordSaveRequestDto dto = new PasswordSaveRequestDto();
+        dto.setPassword(password);
+        dto.setKey(key);
+        dto.setName(name);
+        dto.setDescription(description);
+
+        return managementService.savePassword(dto, userId);
+    }
+
+    @BeforeEach
+    public void cleanDb(){
+        passwordRepository.deleteAll();
     }
 }

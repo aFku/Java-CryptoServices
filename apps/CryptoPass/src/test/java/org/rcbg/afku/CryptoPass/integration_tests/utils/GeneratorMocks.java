@@ -1,10 +1,9 @@
-package org.rcbg.afku.CryptoPass.integration_tests;
+package org.rcbg.afku.CryptoPass.integration_tests.utils;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.regex.Pattern;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.extern.slf4j.Slf4j;

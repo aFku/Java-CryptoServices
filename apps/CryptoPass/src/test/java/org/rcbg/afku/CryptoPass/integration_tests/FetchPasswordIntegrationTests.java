@@ -2,49 +2,20 @@ package org.rcbg.afku.CryptoPass.integration_tests;
 
 import org.apache.http.HttpHeaders;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.rcbg.afku.CryptoPass.dto.PasswordSaveRequestDto;
 import org.rcbg.afku.CryptoPass.dto.SafeFetchResponseDto;
-import org.rcbg.afku.CryptoPass.services.PasswordManagementService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.rcbg.afku.CryptoPass.integration_tests.utils.KeycloakUser;
+import org.rcbg.afku.CryptoPass.integration_tests.utils.WireMockConfig;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = { WireMockConfig.class })
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class FetchPasswordIntegrationTests extends TestContainersBase{
-
-    @Autowired
-    private PasswordManagementService managementService;
-
-    private SafeFetchResponseDto createPasswordInStorage(String password, String key, String name, String description, String userId) {
-        PasswordSaveRequestDto dto = new PasswordSaveRequestDto();
-        dto.setPassword(password);
-        dto.setKey(key);
-        dto.setName(name);
-        dto.setDescription(description);
-
-        return managementService.savePassword(dto, userId);
-    }
-
-    @BeforeEach
-    public void cleanDb(){
-        passwordRepository.deleteAll();
-    }
 
     @Test
     public void testGetAllPasswordsContainsUserData() throws Exception {
@@ -84,6 +55,72 @@ public class FetchPasswordIntegrationTests extends TestContainersBase{
         String jwt = obtainJwtToken(KeycloakUser.PASSUSER3);
 
         this.mockMvc.perform(get("/api/v1/passwords")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGetSpecificPasswordNotFound() throws Exception {
+        String jwt = obtainJwtToken(KeycloakUser.PASSUSER2);
+
+        this.mockMvc.perform(get("/api/v1/passwords/123")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                        .header("ENCRYPTION-KEY", "secretKey1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetSpecificPasswordFoundWithValidKey() throws Exception {
+        SafeFetchResponseDto password = createPasswordInStorage("secretPassword1", "secretKey1", "name1", "desc", KeycloakUser.PASSUSER2.getUserId());
+        String jwt = obtainJwtToken(KeycloakUser.PASSUSER2);
+
+        this.mockMvc.perform(get("/api/v1/passwords/" + password.getPasswordId())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                        .header("ENCRYPTION-KEY", "secretKey1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.password").value("secretPassword1"));
+    }
+
+    @Test
+    public void testGetSpecificPasswordFoundWithInvalidKey() throws Exception {
+        SafeFetchResponseDto password = createPasswordInStorage("secretPassword1", "secretKey1", "name1", "desc", KeycloakUser.PASSUSER2.getUserId());
+        String jwt = obtainJwtToken(KeycloakUser.PASSUSER2);
+
+        this.mockMvc.perform(get("/api/v1/passwords/" + password.getPasswordId())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                        .header("ENCRYPTION-KEY", "NotSecretKey321"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testGetSpecificPasswordNotOwnedByUserWithValidKey() throws Exception {
+        SafeFetchResponseDto password = createPasswordInStorage("secretPassword1", "secretKey1", "name1", "desc", KeycloakUser.PASSUSER2.getUserId());
+        String jwt = obtainJwtToken(KeycloakUser.PASSUSER1);
+
+        this.mockMvc.perform(get("/api/v1/passwords/" + password.getPasswordId())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                        .header("ENCRYPTION-KEY", "secretKey1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.messages[0]").value("You don't have password with such ID"));
+    }
+
+    @Test
+    public void testGetSpecificPasswordNotOwnedByUserWithInvalidKey() throws Exception {
+        SafeFetchResponseDto password = createPasswordInStorage("secretPassword1", "secretKey1", "name1", "desc", KeycloakUser.PASSUSER2.getUserId());
+        String jwt = obtainJwtToken(KeycloakUser.PASSUSER1);
+
+        this.mockMvc.perform(get("/api/v1/passwords/" + password.getPasswordId())
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
+                        .header("ENCRYPTION-KEY", "NotSecretKey321"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.messages[0]").value("You don't have password with such ID"));
+    }
+
+    @Test
+    public void testGetSpecificPasswordUserHasNoAccessToService() throws Exception {
+        String jwt = obtainJwtToken(KeycloakUser.PASSUSER3);
+
+        this.mockMvc.perform(get("/api/v1/passwords/1")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt))
                 .andExpect(status().isForbidden());
     }

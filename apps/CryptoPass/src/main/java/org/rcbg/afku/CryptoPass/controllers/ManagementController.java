@@ -49,7 +49,7 @@ public class ManagementController {
     @PostMapping
     public ResponseEntity<SafeFetchResponse> savePasswordDirectly(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, Authentication authentication){
         SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, authentication.getName());
-        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
+        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.CREATED, responseDto);
     }
 
     @DeleteMapping("/{id}")
