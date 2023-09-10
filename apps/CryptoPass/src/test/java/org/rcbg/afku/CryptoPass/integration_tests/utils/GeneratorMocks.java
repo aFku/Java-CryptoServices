@@ -26,13 +26,57 @@ public class GeneratorMocks {
         }
     }
 
-    public static void setupOkResponse(WireMockServer mockService, String profileName) {
+    public static void setupOkResponseWithProfile(WireMockServer mockService) {
         mockService.stubFor(WireMock.get(WireMock.urlMatching("/api/v1/passwords.*")).withQueryParam("profileName", WireMock.anyUrl().getPattern())
                 .willReturn(WireMock.aResponse()
                         .withStatus(HttpStatus.OK.value())
                         .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                         .withBody(
                                 streamToString(Objects.requireNonNull(GeneratorMocks.class.getClassLoader().getResourceAsStream("payloads/ok_password.json")))
+                        ))
+        );
+    }
+
+    public static void setupOkResponseWithProperties(WireMockServer mockService) {
+        mockService.stubFor(WireMock.post(WireMock.urlMatching("/api/v1/passwords.*"))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.OK.value())
+                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .withBody(
+                                streamToString(Objects.requireNonNull(GeneratorMocks.class.getClassLoader().getResourceAsStream("payloads/ok_password.json")))
+                        ))
+        );
+    }
+
+    public static void setupProfileNotFoundResponse(WireMockServer mockService) {
+        mockService.stubFor(WireMock.get(WireMock.urlMatching("/api/v1/passwords.*")).withQueryParam("profileName", WireMock.anyUrl().getPattern())
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.NOT_FOUND.value())
+                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .withBody(
+                                streamToString(Objects.requireNonNull(GeneratorMocks.class.getClassLoader().getResourceAsStream("payloads/profile_not_found.json")))
+                        ))
+        );
+    }
+
+    public static void setupPropertiesIncorrectResponse(WireMockServer mockService) {
+        mockService.stubFor(WireMock.post(WireMock.urlMatching("/api/v1/passwords.*"))
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.BAD_REQUEST.value())
+                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .withBody(
+                                streamToString(Objects.requireNonNull(GeneratorMocks.class.getClassLoader().getResourceAsStream("payloads/wrong_properties.json")))
+                        ))
+        );
+    }
+
+    public static void setupUnauthorizedResponse(WireMockServer mockService) {
+        mockService.stubFor(WireMock.get(WireMock.urlMatching("/api/v1/passwords.*")).withQueryParam("profileName", WireMock.anyUrl().getPattern())
+                .willReturn(WireMock.aResponse()
+                        .withStatus(HttpStatus.FORBIDDEN.value())
+                        .withHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                        .withBody(
+                                "{\"messages\": [\"Forbidden\"]}"
                         ))
         );
     }

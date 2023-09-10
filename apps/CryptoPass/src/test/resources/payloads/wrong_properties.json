@@ -1,0 +1,11 @@
+{
+  "metaData": {
+    "uri": "/passwords",
+    "statusCode": 404,
+    "timestamp": "2023-08-20T08:16:45+00:00",
+    "contentType": "application/json"
+  },
+  "messages": [
+    "Password length should be between 6 and 255"
+  ]
+}
