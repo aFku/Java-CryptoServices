@@ -1,0 +1,29 @@
+version: "3.9"
+name: "investment-integration-tests"
+services:
+  db_integration:
+    image: mysql:latest
+    container_name: cryptopass-dev-db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_PASSWORD=password
+      - MYSQL_USER=user
+      - MYSQL_DATABASE=cryptopass
+  keycloak:
+    image: quay.io/keycloak/keycloak:21.1.1
+    entrypoint: "/opt/keycloak/bin/kc.sh start-dev --import-realm"
+    volumes:
+      - ./realm:/opt/keycloak/data/import
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - DB_VENDOR=h2
+      - PROXY_ADDRESS_FORWARDING=true
+      - KEYCLOAK_IMPORT=/opt/keycloak/data/import
+    ports:
+      - "8000:8080"
+      - "9080:9080"
+      - "9443:9443"
+      - "10990:10990"
