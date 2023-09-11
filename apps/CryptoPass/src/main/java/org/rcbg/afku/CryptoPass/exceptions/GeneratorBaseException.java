@@ -11,12 +11,12 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 public class GeneratorBaseException extends RuntimeException{
     protected String targetUrl;
-    protected Response.Body responseBody;
+    protected String errorMessage;
     protected HttpStatus status;
 
-    public GeneratorBaseException(String targetUrl, Response.Body responseBody, HttpStatus status) {
+    public GeneratorBaseException(String targetUrl, String errorMessage, HttpStatus status) {
         this.targetUrl = targetUrl;
-        this.responseBody = responseBody;
+        this.errorMessage = errorMessage;
         this.status = status;
     }
 }

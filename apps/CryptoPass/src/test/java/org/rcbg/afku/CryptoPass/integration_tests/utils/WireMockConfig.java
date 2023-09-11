@@ -1,4 +1,4 @@
-package org.rcbg.afku.CryptoPass.integration_tests;
+package org.rcbg.afku.CryptoPass.integration_tests.utils;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.springframework.boot.test.context.TestConfiguration;

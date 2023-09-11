@@ -49,7 +49,7 @@ public class ManagementController {
     @PostMapping
     public ResponseEntity<SafeFetchResponse> savePasswordDirectly(HttpServletRequest request, @RequestBody PasswordSaveRequestDto requestDto, Authentication authentication){
         SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, authentication.getName());
-        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
+        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.CREATED, responseDto);
     }
 
     @DeleteMapping("/{id}")
@@ -64,7 +64,7 @@ public class ManagementController {
         PasswordSaveRequestDto passwordData = requestDto.getPasswordData();
         passwordData.setPassword(password);
         SafeFetchResponseDto responseDto = managementService.savePassword(passwordData, authentication.getName());
-        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
+        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.CREATED, responseDto);
     }
 
     @PostMapping("/profiles")
@@ -72,6 +72,6 @@ public class ManagementController {
         String password = generatorClientService.generatePasswordWithProfileName(request.getHeader("Authentication"), profileName);
         requestDto.setPassword(password);
         SafeFetchResponseDto responseDto = managementService.savePassword(requestDto, authentication.getName());
-        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.OK, responseDto);
+        return ResponseFactory.createSafeFetchResponse(request.getRequestURI(), HttpStatus.CREATED, responseDto);
     }
 }
