@@ -141,7 +141,7 @@ public class GeneratorsIntegrationTests extends TestContainersBase{
     @Test
     public void testGenerateKeysWithIncorrectAlgorithm() throws Exception {
         AsymmetricKeysProfileRequestBody data = new AsymmetricKeysProfileRequestBody();
-        data.setProfileName("testname3");
+        data.setProfileName("testname5");
         data.setReturnBase64(false);
         data.setAlgorithm("SDA");
         profilesManager.createProfile(data, "testUser");

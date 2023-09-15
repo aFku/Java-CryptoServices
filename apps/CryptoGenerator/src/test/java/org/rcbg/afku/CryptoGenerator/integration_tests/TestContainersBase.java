@@ -34,9 +34,9 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class TestContainersBase {
 
-    @Container
+
     protected static KeycloakContainer keycloak;
-    @Container
+
     protected static K3sContainer k3s;
 
     protected static Config config;
