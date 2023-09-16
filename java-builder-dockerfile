@@ -1,0 +1,20 @@
+FROM openjdk:17-jdk-alpine
+
+RUN apk add --no-cache curl tar bash
+
+# Maven
+ARG MAVEN_VERSION=3.9.4
+RUN mkdir -p /tmp/maven && curl http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar -xzC /tmp/maven --strip-components=1 && ln -s /tmp/maven/bin/mvn /usr/bin/mvn
+
+ENV MAVEN_HOME=/tmp/maven
+ENV MAVEN_CONFIG=/root/.m2
+ENV MAVEN_OPTS="-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+ENTRYPOINT ["/usr/bin/mvn"]
+
+# Install dependencies
+ARG PATH_TO_PROJECT
+RUN mkdir -p /tmp/app
+WORKDIR /tmp/app
+COPY $PATH_TO_PROJECT/pom.xml /tmp/app
+RUN mvn dependency:resolve && rm -rf /tmp/app/target
+COPY $PATH_TO_PROJECT/src /tmp/app/src
