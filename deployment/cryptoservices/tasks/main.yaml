@@ -1,9 +1,9 @@
-# ---
-# - name: Docker Installation
-#   ansible.builtin.include_tasks: install_docker.yaml
+---
+- name: Docker Installation
+  ansible.builtin.include_tasks: install_docker.yaml
 
-# - name: Install Minikube
-#   ansible.builtin.include_tasks: install_minikube.yaml
+- name: Install Minikube
+  ansible.builtin.include_tasks: install_minikube.yaml
 
 - name: Install MetalLB
   ansible.builtin.include_tasks: install_metallb.yaml
