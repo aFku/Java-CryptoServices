@@ -1,0 +1,18 @@
+# - name: Test CryptoPass
+#   shell: docker run -it --rm -v "/var/run/docker.sock:/var/run/docker.sock" java-builder-cryptopass:latest test
+
+- name: Build JAR for CryptoPass
+  shell: docker run -it --rm -v "/tmp/target:/tmp/app/target" -v "/var/run/docker.sock:/var/run/docker.sock" java-builder-cryptopass:latest package -Dmaven.test.skip=true
+
+- name: Copy JAR file
+  copy:
+    src: /tmp/target/CryptoPass-0.0.1-SNAPSHOT.jar
+    dest: "{{ playbook_dir }}/Java-CryptoServices/apps/CryptoPass/CryptoPass.jar"
+
+- name: Build CryptoPass image
+  shell:
+    chdir: "{{ playbook_dir }}/Java-CryptoServices/apps/CryptoPass"
+    cmd: docker build --tag cryptopass:latest .
+
+- name: Load CryptoPass image into minikube
+  shell: minikube image load cryptopass:latest

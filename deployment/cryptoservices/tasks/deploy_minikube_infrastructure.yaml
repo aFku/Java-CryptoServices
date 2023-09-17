@@ -1,0 +1,77 @@
+- name: Copy file with namespaces
+  copy:
+    src: namespaces.yaml
+    dest: /tmp/namespaces
+
+- name: Apply namespaces
+  shell: minikube kubectl -- apply -f /tmp/namespaces
+
+- name: Copy PasswordProfileCRD file
+  copy:
+    src: passwordprofile-crd.yaml
+    dest: /tmp/passwordprofile-crd.yaml
+
+- name: Apply PasswordProfile CustomResourceDefinition
+  shell: minikube kubectl -- apply -f /tmp/passwordprofile-crd.yaml
+
+- name: Copy PasswordProfile example CR file
+  copy:
+    src: passwordprofile-test-cr.yaml
+    dest: /tmp/passwordprofile-test-cr.yaml
+
+- name: Apply PasswordProfile example CustomResource
+  shell: minikube kubectl -- apply -f /tmp/passwordprofile-test-cr.yaml
+
+- name: Copy Keycloak realm ConfigMap
+  copy:
+    src: keycloak-cm.yaml
+    dest: /tmp/keycloak-cm.yaml
+
+- name: Apply Keycloak realm ConfigMap
+  shell: minikube kubectl -- apply -f /tmp/keycloak-cm.yaml
+
+- name: Copy Keycloak deployment file
+  copy:
+    src: keycloak-deployment.yaml
+    dest: /tmp/keycloak-deployment.yaml
+
+- name: Apply Keycloak deployment
+  shell: minikube kubectl -- apply -f /tmp/keycloak-deployment.yaml
+
+- name: Reset MetalLB
+  shell: minikube kubectl -- delete pods -n metallb-system --all
+
+- name: Apply Kong Ingress
+  shell: minikube kubectl -- apply -f https://raw.githubusercontent.com/Kong/kubernetes-ingress-controller/v2.9.3/deploy/single/all-in-one-dbless.yaml
+
+- name: Copy Kong Ingress resources file
+  copy:
+    src: ingress-resources.yaml
+    dest: /tmp/ingress-resources.yaml
+
+- name: Apply Kong Ingress resources file
+  shell: minikube kubectl -- apply -f /tmp/ingress-resources.yaml
+
+- name: Copy MYSQL deployment file
+  copy:
+    src: mysql-deployment.yaml
+    dest: /tmp/mysql-deployment.yaml
+
+- name: Apply MYSQL deployment
+  shell: minikube kubectl -- apply -f /tmp/mysql-deployment.yaml
+
+- name: Copy CryptoGenerator deployment file
+  copy:
+    src: cryptogenerator-deployment.yaml
+    dest: /tmp/cryptogenerator-deployment.yaml
+
+- name: Apply CryptoGenerator deployment
+  shell: minikube kubectl -- apply -f /tmp/cryptogenerator-deployment.yaml
+
+- name: Copy CryptoPass deployment file
+  copy:
+    src: cryptopass-deployment.yaml
+    dest: /tmp/cryptopass-deployment.yaml
+
+- name: Apply CryptoPass deployment
+  shell: minikube kubectl -- apply -f /tmp/cryptopass-deployment.yaml

@@ -1,0 +1,24 @@
+- name: Set strictARP in kubeconfig
+  shell: "minikube kubectl -- get configmap kube-proxy -n kube-system -o yaml | sed -e \"s/strictARP: false/strictARP: true/\" | minikube kubectl -- apply -f - -n kube-system"
+
+- name: Set mode to ipvs in kubeconfig
+  shell: "minikube kubectl -- get configmap kube-proxy -n kube-system -o yaml | sed -e \"s/mode:.*/mode: ipvs/\" | minikube kubectl -- apply -f - -n kube-system"
+
+- name: Add MetalLB manifest to cluster
+  shell: minikube kubectl -- apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.11/config/manifests/metallb-native.yaml
+
+- name: Copy metallb-pool.yaml
+  copy:
+    src: metallb-pool.yaml
+    dest: /tmp/metallb-pool.yaml
+
+- name: Add metallb-pool to cluster
+  shell: minikube kubectl -- apply -f /tmp/metallb-pool.yaml
+
+- name: Copy metallb-advert.yaml
+  copy:
+    src: metallb-advert.yaml
+    dest: /tmp/metallb-advert.yaml
+
+- name: Add metallb-advert to cluster
+  shell: minikube kubectl -- apply -f /tmp/metallb-advert.yaml

@@ -1,0 +1,18 @@
+# - name: Test CryptoGenerator
+#   shell: docker run -it --rm -v "/var/run/docker.sock:/var/run/docker.sock" java-builder-cryptogenerator:latest test
+
+- name: Build JAR for CryptoGenerator
+  shell: docker run -it --rm -v "/tmp/target:/tmp/app/target" -v "/var/run/docker.sock:/var/run/docker.sock" java-builder-cryptogenerator:latest package -Dmaven.test.skip=true
+
+- name: Copy JAR file
+  copy:
+    src: /tmp/target/CryptoGenerator-0.0.1-SNAPSHOT.jar
+    dest: "{{ playbook_dir }}/Java-CryptoServices/apps/CryptoGenerator/CryptoGenerator.jar"
+
+- name: Build CryptoGenerator image
+  shell:
+    chdir: "{{ playbook_dir }}/Java-CryptoServices/apps/CryptoGenerator"
+    cmd: docker build --tag cryptogenerator:latest .
+
+- name: Load CryptoGenerator image into minikube
+  shell: minikube image load cryptogenerator:latest

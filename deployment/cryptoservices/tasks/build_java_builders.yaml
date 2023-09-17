@@ -1,0 +1,21 @@
+---
+- name: Install git
+  become: true
+  yum:
+    state: present
+    name: git
+
+- name: Download repository with source code
+  git:
+    repo: https://github.com/aFku/Java-CryptoServices.git
+    dest: "{{ playbook_dir }}/Java-CryptoServices"
+
+- name: Build builder for CryptoGenerator
+  shell: 
+    cmd: docker build --build-arg PATH_TO_PROJECT=Java-CryptoServices/apps/CryptoGenerator --tag java-builder-cryptogenerator:latest --file './Java-CryptoServices/java-builder-dockerfile' .
+    chdir: "{{ playbook_dir }}"
+
+- name: Build builder for CryptoPass
+  shell: 
+    cmd: docker build --build-arg PATH_TO_PROJECT=Java-CryptoServices/apps/CryptoPass --tag java-builder-cryptopass:latest --file './Java-CryptoServices/java-builder-dockerfile' .
+    chdir: "{{ playbook_dir }}"

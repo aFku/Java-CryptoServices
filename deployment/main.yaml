@@ -1,0 +1,8 @@
+---
+- name: Main
+  hosts: local
+
+  tasks:
+    - name: Import cryptoservices role
+      include_role:
+        name: cryptoservices

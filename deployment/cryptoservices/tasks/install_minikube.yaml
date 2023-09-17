@@ -1,0 +1,34 @@
+---
+- name: Install kubectl
+  become: true
+  yum:
+    name: kubernetes-client
+    state: present
+
+- name: Download minikube
+  become: true
+  get_url:
+    url: https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+    dest: /tmp/minikube-install
+    mode: '1700'
+  
+- name: Install minikube
+  become: true
+  shell: install /tmp/minikube-install /usr/local/bin/minikube
+
+- name: Register regular local user name
+  shell: "echo '{{ ansible_user_id }}'"
+  register: local_user_name
+
+- name: "Add user {{ local_user_name.stdout }} to group"
+  become: true
+  user:
+    name: "{{ local_user_name.stdout }}"
+    groups: docker
+    append: yes
+
+- name: Reload connection to apply groups
+  ansible.builtin.meta: reset_connection
+
+- name: Start minikube
+  shell: "minikube start --driver=docker --cpus='{{ cpus }}' --memory='{{ memory }}'"

@@ -1,0 +1,86 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloak-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: kong
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+        - path: /admin(/|$)(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: keycloak-service
+              port:
+                number: 80
+        - path: /auth
+          pathType: Prefix
+          backend:
+            service:
+              name: keycloak-service
+              port:
+                number: 80
+        - path: /resources(/|$)(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: keycloak-service
+              port:
+                number: 80
+        - path: /realms(/|$)(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: keycloak-service
+              port:
+                number: 80
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cryptogenerator-ingress
+  namespace: generation-service
+  annotations:
+    kubernetes.io/ingress.class: kong
+    konghq.com/strip-path: "true"
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+        - path: /cryptogenerator/
+          pathType: Prefix
+          backend:
+            service:
+              name: cryptogenerator-service
+              port:
+                number: 8080
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cryptopass-ingress
+  namespace: pass-service
+  annotations:
+    kubernetes.io/ingress.class: kong
+    konghq.com/strip-path: "true"
+spec:
+  rules:
+    - host: localhost
+      http:
+        paths:
+        - path: /cryptopass/
+          pathType: Prefix
+          backend:
+            service:
+              name: cryptopass-service
+              port:
+                number: 8080

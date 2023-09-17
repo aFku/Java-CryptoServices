@@ -1,0 +1,50 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-generator
+  namespace: generation-service
+  labels:
+    app: crypto-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crypto-generator
+  template:
+    metadata:
+      labels:
+        app: crypto-generator
+    spec:
+      serviceAccountName: cgenerator-svc
+      automountServiceAccountToken: true
+      containers:
+      - name: crypto-generator
+        image: cryptogenerator:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cryptogenerator-service
+  namespace: generation-service
+spec:
+  selector:
+    app: crypto-generator
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cgenerator-svc
+  namespace: generation-service

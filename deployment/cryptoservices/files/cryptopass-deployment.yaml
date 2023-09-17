@@ -1,0 +1,53 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-pass
+  namespace: pass-service
+  labels:
+    app: crypto-pass
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crypto-pass
+  template:
+    metadata:
+      labels:
+        app: crypto-pass
+    spec:
+      serviceAccountName: cpass-svc
+      automountServiceAccountToken: true
+      containers:
+      - name: crypto-pass
+        image: cryptopass:latest
+        imagePullPolicy: Never
+        env:
+          - name: CRYPTOGENERATOR_URL
+            value: http://cryptogenerator-service.generation-service/api/v1/
+        ports:
+        - containerPort: 8080
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cryptopass-service
+  namespace: pass-service
+spec:
+  selector:
+    app: crypto-pass
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cpass-svc
+  namespace: pass-service

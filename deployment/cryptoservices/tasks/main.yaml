@@ -1,0 +1,21 @@
+# ---
+# - name: Docker Installation
+#   ansible.builtin.include_tasks: install_docker.yaml
+
+# - name: Install Minikube
+#   ansible.builtin.include_tasks: install_minikube.yaml
+
+- name: Install MetalLB
+  ansible.builtin.include_tasks: install_metallb.yaml
+
+- name: Create Builders
+  ansible.builtin.include_tasks: build_java_builders.yaml
+
+- name: Build CryptoGenerator
+  ansible.builtin.include_tasks: test_and_build_cryptogenerator.yaml
+
+- name: Build CryptoPass
+  ansible.builtin.include_tasks: test_and_build_cryptopass.yaml
+
+- name: Deploy minikube infrastructure
+  ansible.builtin.include_tasks: deploy_minikube_infrastructure.yaml
